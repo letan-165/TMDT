@@ -3,3 +3,5 @@
 ### https://1drv.ms/w/c/1d7eb7d3d658e011/Ea2H5fPeYuhDhJMYCb48wesBEf62L5lAGqkoQ7jumKJ1eQ?e=H98aw9
 ## Excel:
 ### https://1drv.ms/x/c/1d7eb7d3d658e011/EWlEtA_e1hRHvZ_c3SDbKWkB0Ndp7J57Q46b1sf3KsjDVQ?e=ycEf4Y
+## Diagram:
+### https://app.diagrams.net/#G1bGEn1Sy3PbQfMy0ACMFpyPF8P6yeKyyS#%7B%22pageId%22%3A%22AeEUtRrVnPp8lxNpd-bg%22%7D
