@@ -21,18 +21,18 @@ export function LoginForm({
         <CardHeader>
           <CardTitle className="text-2xl">Đăng nhập</CardTitle>
           <CardDescription>
-            Nhập email và mật khẩu để đăng nhập
+            Nhập tài khoản và mật khẩu để đăng nhập
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">Tài khoản</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
+                  id="text"
+                  type="text"
+                  placeholder="user 123"
                   required
                 />
               </div>
@@ -46,7 +46,13 @@ export function LoginForm({
                     Quên mật khẩu?
                   </Link>
                 </div>
-                <Input id="password" type="password" required />
+                <Input 
+                id="password" 
+                type="password"
+                placeholder="••••••••"
+                required 
+
+                />
               </div>
               <Button type="submit" className="w-full">
                 Đăng nhập
