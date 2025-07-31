@@ -1,34 +1,45 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Query, Param } from '@nestjs/common';
 import { StatsService } from './stats.service';
-import { CreateStatDto } from './dto/create-stat.dto';
-import { UpdateStatDto } from './dto/update-stat.dto';
 
 @Controller('stats')
 export class StatsController {
-  constructor(private readonly statsService: StatsService) {}
-
-  @Post()
-  create(@Body() createStatDto: CreateStatDto) {
-    return this.statsService.create(createStatDto);
-  }
+  constructor(private readonly statsService: StatsService) { }
 
   @Get()
-  findAll() {
-    return this.statsService.findAll();
+  getOverallStats() {
+    return this.statsService.getOverallStats();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.statsService.findOne(+id);
+  @Get('dashboard')
+  getDashboardStats() {
+    return this.statsService.getDashboardStats();
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStatDto: UpdateStatDto) {
-    return this.statsService.update(+id, updateStatDto);
+  @Get('revenue/month/:year/:month')
+  getRevenueByMonth(
+    @Param('year') year: number,
+    @Param('month') month: number
+  ) {
+    return this.statsService.getRevenueByMonth(+year, +month);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.statsService.remove(+id);
+  @Get('revenue/year/:year')
+  getRevenueByYear(@Param('year') year: number) {
+    return this.statsService.getRevenueByYear(+year);
+  }
+
+  @Get('revenue/range')
+  getRevenueRange(
+    @Query('fromYear') fromYear: number,
+    @Query('fromMonth') fromMonth: number,
+    @Query('toYear') toYear: number,
+    @Query('toMonth') toMonth: number
+  ) {
+    return this.statsService.getRevenueRange(+fromYear, +fromMonth, +toYear, +toMonth);
+  }
+
+  @Get('revenue/top')
+  getTopRevenueMonths(@Query('limit') limit: number = 12) {
+    return this.statsService.getTopRevenueMonths(+limit);
   }
 }

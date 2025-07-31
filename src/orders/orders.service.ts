@@ -1,26 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { Order, OrderDocument } from './schemas/order.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class OrdersService {
-  create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
+  constructor(
+    @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
+  ) {}
+  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+    const createdOrder = new this.orderModel(createOrderDto);
+    return await createdOrder.save();
   }
 
-  findAll() {
-    return `This action returns all orders`;
+  async findAll(): Promise<Order[]> {
+    return await this.orderModel.find().populate('userId').exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findOne(id: string): Promise<Order | null> {
+    return await this.orderModel.findById(id).populate('userId').exec();
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  async update(id: string, updateOrderDto: UpdateOrderDto): Promise<Order | null> {
+    return await this.orderModel.findByIdAndUpdate(id, updateOrderDto, { new: true }).exec();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  async remove(id: string): Promise<Order | null> {
+    return await this.orderModel.findByIdAndDelete(id).exec();
   }
+  async findOrdersByUserId(userId: string): Promise<Order[]> {
+    return await this.orderModel.find({ userId }).populate('userId').exec();
+  }
+
+  async findOrderDetailsByOrderId(orderId: string): Promise<Order | null> {
+    return await this.orderModel.findById(orderId).populate('orderDetails').exec();
+  }
+
 }
+
+

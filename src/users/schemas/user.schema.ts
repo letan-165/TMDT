@@ -6,7 +6,10 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop()
+  @Prop({ required: true, unique: true})
+  username: string;
+
+  @Prop({ required: true, unique: true })
   email: string;
 
   @Prop()
@@ -27,6 +30,19 @@ export class User {
   @Prop({ required: true, enum: ['LOCAL', 'GOOGLE'] })
   provider: string;
 
+  @Prop()
+  codeReset: string;
+
+  @Prop({ type: Date, default: null })
+  codeResetExpires: Date;
+
+  @Prop()
+  passwordResetToken?: string;
+
+  @Prop({ type: Date, default: null })
+  passwordResetTokenExpires?: Date;
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+

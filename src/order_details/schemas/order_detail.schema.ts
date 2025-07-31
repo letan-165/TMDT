@@ -10,17 +10,14 @@ export class OrderDetail {
   @Prop({ type: Types.ObjectId, ref: 'Order', required: true })
   orderId: Order;
 
-    @Prop({ type: Types.ObjectId, ref: 'Product', required: true })
-    productId: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Product', required: true })
+  productId: Types.ObjectId;
 
   @Prop({ required: true })
   quantity: number;
 
   @Prop({ required: true })
   price: number;
-
-  @Prop({ default: 0 })
-  discount: number;
 
 }
 
