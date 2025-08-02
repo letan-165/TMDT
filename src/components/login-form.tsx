@@ -1,5 +1,10 @@
 "use client"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { login } from "@/lib/api"
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -17,6 +22,23 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const router = useRouter()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+
+    try {
+      const result = await login(username, password)
+      console.log("Đăng nhập thành công:", result)
+      router.push("/dashboard")
+    } catch (err: any) {
+      setError(err.message)
+    }
+  }
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
@@ -34,14 +56,14 @@ export function LoginForm({
         }
         const data = await response.json();
         console.log("Login successful:", data);
-        // Xử lý dữ liệu sau khi đăng nhập thành công
-      } catch (error) {
-        console.error("Google login error:", error);
-        throw error;
+        router.push("/dashboard");
+      } catch (error: any) {
+        setError(error.message);
       }
     },
     onError: (error) => {
-      console.error("Google login failed:", error);
+      console.error("Google login error:", error);
+      setError("Đăng nhập với Google thất bại");
     },
     flow: "auth-code",
   })
@@ -55,14 +77,16 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Tài khoản</Label>
+                <Label htmlFor="username">Tài khoản</Label>
                 <Input
-                  id="text"
+                  id="username"
                   type="text"
-                  placeholder="user 123"
+                  placeholder="user123"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
                 />
               </div>
@@ -80,14 +104,20 @@ export function LoginForm({
                   id="password"
                   type="password"
                   placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
-
                 />
               </div>
+
+              {error && (
+                <p className="text-sm text-red-500">{error}</p>
+              )}
+
               <Button type="submit" className="w-full">
                 Đăng nhập
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => googleLogin()}>
+              <Button variant="outline" className="w-full" type="button" onClick={() => googleLogin()}>
                 Đăng nhập với Google
               </Button>
             </div>
