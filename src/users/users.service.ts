@@ -43,6 +43,35 @@ export class UsersService {
 
   }
 
+  async processGoogleLogin(userData: any) {
+    const { email, name, googleId, avatar } = userData;
+    if (!email || !googleId) {
+      throw new Error('Email and Google ID are required');
+    }
+    const existingUser = await this.userModel.findOne({ email, provider: 'GOOGLE' });
+    if (existingUser) {
+      return existingUser;
+    }
+    const existingEmail = await this.userModel.findOne({ email });
+    if (existingEmail) {
+      const updateUser = await this.userModel.updateOne(
+        { _id: existingEmail._id },
+        { googleId, provider: 'GOOGLE', avatar }
+      );      
+      return updateUser;
+    }
+    const newUser = new this.userModel({
+      username: email,
+      email,
+      name,
+      googleId,
+      avatar,
+      provider: 'GOOGLE',
+    });
+    await newUser.save();
+    return newUser;
+  }
+
   async checkEmail(email: string) {
     if (!email) {
       throw new Error('Email is required');

@@ -24,6 +24,19 @@ export class AuthController {
     return result;
   }
 
+  @Get('profile')
+  @UseGuards(LocalAuthGuard)
+  async getProfile(@Req() req) {
+    return req.user;
+  }
+
+  @Post('google-login')
+  @Public()
+  async loginWithGoogle(@Body('code') code: string, @Res({ passthrough: true }) res: Response) {
+    const user = await this.authService.loginWithGoogle(code, res);
+    return user;
+  }
+
   @Post('forgot-password')
   @Public()
   async forgotPassword(@Body('email') email: string) {
