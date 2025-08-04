@@ -5,7 +5,6 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { GetProductsQueryDto } from './dto/get-products-query.dto';
 import { Product, ProductDocument } from './schemas/product.schema';
-import { StockUpdateDto } from './interfaces/product.interface';
 
 @Injectable()
 export class ProductsService {
@@ -15,21 +14,10 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto) {
     try {
-      const { categoryId, ...productData } = createProductDto;
-
-      const newProduct = new this.productModel({
-        ...productData,
-        category: new Types.ObjectId(categoryId),
-      });
-
+      const newProduct = new this.productModel(createProductDto);
       const savedProduct = await newProduct.save();
-      await savedProduct.populate('category');
-
-      return {
-        success: true,
-        data: savedProduct,
-        message: 'Sản phẩm đã được tạo thành công',
-      };
+      // await savedProduct.populate('categoryId', 'name description');
+      return savedProduct;
     } catch (error) {
       throw new Error(`Không thể tạo sản phẩm: ${error.message}`);
     }
@@ -388,61 +376,61 @@ export class ProductsService {
     }
   }
 
-  async updateStockAdvanced(id: string, stockUpdateDto: StockUpdateDto) {
-    try {
-      if (!Types.ObjectId.isValid(id)) {
-        throw new NotFoundException('ID sản phẩm không hợp lệ');
-      }
+  // async updateStockAdvanced(id: string, stockUpdateDto: StockUpdateDto) {
+  //   try {
+  //     if (!Types.ObjectId.isValid(id)) {
+  //       throw new NotFoundException('ID sản phẩm không hợp lệ');
+  //     }
 
-      const product = await this.productModel.findById(id);
-      if (!product) {
-        throw new NotFoundException('Không tìm thấy sản phẩm');
-      }
+  //     const product = await this.productModel.findById(id);
+  //     if (!product) {
+  //       throw new NotFoundException('Không tìm thấy sản phẩm');
+  //     }
 
-      let newStock: number;
-      const { quantity, operation } = stockUpdateDto;
+  //     let newStock: number;
+  //     const { quantity, operation } = stockUpdateDto;
 
-      switch (operation) {
-        case 'increase':
-          newStock = product.stock + quantity;
-          break;
-        case 'decrease':
-          newStock = product.stock - quantity;
-          if (newStock < 0) {
-            throw new Error('Số lượng tồn kho không đủ');
-          }
-          break;
-        case 'set':
-          newStock = quantity;
-          if (newStock < 0) {
-            throw new Error('Số lượng tồn kho không thể âm');
-          }
-          break;
-        default:
-          throw new Error('Phép toán không hợp lệ');
-      }
+  //     switch (operation) {
+  //       case 'increase':
+  //         newStock = product.stock + quantity;
+  //         break;
+  //       case 'decrease':
+  //         newStock = product.stock - quantity;
+  //         if (newStock < 0) {
+  //           throw new Error('Số lượng tồn kho không đủ');
+  //         }
+  //         break;
+  //       case 'set':
+  //         newStock = quantity;
+  //         if (newStock < 0) {
+  //           throw new Error('Số lượng tồn kho không thể âm');
+  //         }
+  //         break;
+  //       default:
+  //         throw new Error('Phép toán không hợp lệ');
+  //     }
 
-      const updatedProduct = await this.productModel
-        .findByIdAndUpdate(
-          id,
-          { stock: newStock },
-          { new: true }
-        )
-        .populate('category', 'name')
-        .exec();
+  //     const updatedProduct = await this.productModel
+  //       .findByIdAndUpdate(
+  //         id,
+  //         { stock: newStock },
+  //         { new: true }
+  //       )
+  //       .populate('category', 'name')
+  //       .exec();
 
-      return {
-        success: true,
-        data: updatedProduct,
-        message: `Cập nhật tồn kho thành công (${operation}: ${quantity})`,
-      };
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new Error(`Không thể cập nhật tồn kho: ${error.message}`);
-    }
-  }
+  //     return {
+  //       success: true,
+  //       data: updatedProduct,
+  //       message: `Cập nhật tồn kho thành công (${operation}: ${quantity})`,
+  //     };
+  //   } catch (error) {
+  //     if (error instanceof NotFoundException) {
+  //       throw error;
+  //     }
+  //     throw new Error(`Không thể cập nhật tồn kho: ${error.message}`);
+  //   }
+  // }
 
   async toggleProductStatus(id: string) {
     try {

@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Res, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
 import { Public } from './decorator/public';
 import { Roles } from './decorator/roles.decorator';
 import { LocalAuthGuard } from './guard/local-auth.guard';
 import { Response } from 'express';
+import { CreateUserDto } from '@/users/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -12,8 +12,8 @@ export class AuthController {
 
   @Post('register')
   @Public()
-  async register(@Body() createAuthDto: CreateAuthDto) {
-    return await this.authService.handleRegister(createAuthDto);
+  async register(@Body() createUserDto: CreateUserDto) {
+    return await this.authService.handleRegister(createUserDto);
   }
 
   @UseGuards(LocalAuthGuard)
@@ -25,7 +25,6 @@ export class AuthController {
   }
 
   @Get('profile')
-  @UseGuards(LocalAuthGuard)
   async getProfile(@Req() req) {
     return req.user;
   }
@@ -55,4 +54,16 @@ export class AuthController {
     return this.authService.resetPassword(resetToken, newPassword);
   }
 
+  @Post('refresh-token')
+  async refreshToken(@Req() req, @Res({ passthrough: true }) res: Response) {
+    const user = req.user;
+    return this.authService.refreshToken(user, res);
+  }
+
+  @Post('logout')
+  async logout(@Res() res: Response) {
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
+    return res.status(200).json({ message: 'Logged out successfully' });
+  }
 }

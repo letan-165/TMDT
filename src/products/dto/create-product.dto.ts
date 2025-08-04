@@ -1,8 +1,9 @@
-import { IsString, IsNumber, IsOptional, IsBoolean, IsMongoId, Min } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsBoolean, IsMongoId, Min, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateProductDto {
     @IsString()
+    @IsNotEmpty()
     name: string;
 
     @IsOptional()
@@ -10,7 +11,6 @@ export class CreateProductDto {
     description?: string;
 
     @IsOptional()
-    @IsString()
     image?: string;
 
     @IsNumber()
@@ -25,13 +25,14 @@ export class CreateProductDto {
     stock?: number = 0;
 
     @IsOptional()
-    @IsString()
-    brand?: string;
-
-    @IsOptional()
     @IsBoolean()
-    isActive?: boolean = true;
+    status?: boolean;
 
     @IsMongoId()
+    @IsNotEmpty()
     categoryId: string;
+
+    @IsMongoId()
+    @IsNotEmpty()
+    sellerId: string;
 }

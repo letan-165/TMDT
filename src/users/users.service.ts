@@ -10,6 +10,9 @@ import dayjs from 'dayjs';
 import { SendMailService } from '@/send-mail/send-mail.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { UpdateUsersAdminDto } from './dto/update-users-admin.dto';
+import { instanceToPlain } from 'class-transformer';
+import aqp from 'api-query-params';
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>,
@@ -41,6 +44,51 @@ export class UsersService {
       console.log('Error creating user:', error);
     }
 
+  }
+
+  async InitAdmin() {
+    const adminExists = await this.userModel.findOne({ role: 'ADMIN' });
+    if (adminExists) {
+      return { message: 'Admin user already exists' };
+    }
+    const passDefault = await hashPassword(this.configService.get<string>('DEFAULT_ADMIN_PASSWORD')!);
+    const newUser = new this.userModel({
+      username: 'admin',
+      email: 'admin@example.com',
+      password: passDefault,
+      name: 'Admin',
+      provider: 'LOCAL',
+      role: 'ADMIN',
+    });
+    await newUser.save();
+    return {
+      _id: newUser._id
+    }
+  }
+
+  async createAdmin(createUserDto: CreateUserDto) {
+    const { email, password, name, username } = createUserDto;
+    const checkEmailExists = await this.checkEmail(email);
+    if (checkEmailExists) {
+      throw new Error('Email already exists');
+    }
+    try {
+      const hashedPassword = await hashPassword(password);
+      const newUser = new this.userModel({
+        username,
+        email,
+        password: hashedPassword,
+        name,
+        provider: 'LOCAL',
+        role: 'ADMIN',
+      });
+      await newUser.save();
+      return {
+        _id: newUser._id
+      }
+    } catch (error) {
+      console.log('Error creating admin user:', error);
+    }
   }
 
   async processGoogleLogin(userData: any) {
@@ -158,4 +206,68 @@ export class UsersService {
     );
     return { message: 'Password reset successfully' };
   }
+
+  async updateProfile(userId: string, updateUserDto: UpdateUserDto) {
+    if (!userId || !updateUserDto) {
+      throw new Error('User ID and update data are required');
+    }
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const updatedUser = await this.userModel.findByIdAndUpdate(userId, updateUserDto, { new: true });
+    return updatedUser;
+  }
+
+  async updateUser(userId: string, updateUserDto: UpdateUsersAdminDto) {
+    if (!userId || !updateUserDto) {
+      throw new Error('User ID and update data are required');
+    }
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const updatedUser = await this.userModel.findByIdAndUpdate(userId, updateUserDto, { new: true });
+    return updatedUser;
+  }
+
+  async findAll(query: string, current: number, pageSize: number) {
+    const { filter, sort } = aqp(query);
+    if (filter.current) delete filter.current;
+    if (filter.pageSize) delete filter.pageSize;
+    if (!current) current = 1;
+    if (!pageSize) pageSize = 10;
+
+    const totalItems = (await this.userModel.find(filter)).length;
+    const totalPages = Math.ceil(totalItems / pageSize); 
+    const skip = (current - 1) * pageSize;
+    const users = await this.userModel.find(filter).sort(sort as any).skip(skip).limit(pageSize).exec();
+
+    const results = instanceToPlain(users);
+    return { results, totalPages };
+  }
+
+  async findOne(id: string) {
+    if (!id) {
+      throw new Error('User ID is required');
+    }
+    const user = await this.userModel.findById(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return instanceToPlain(user);
+  }
+
+  async remove(id: string) {
+    if (!id) {
+      throw new Error('User ID is required');
+    }
+    const user = await this.userModel.findById(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    await this.userModel.deleteOne({ _id: id });
+    return { message: 'User deleted successfully' };
+  }
+
 }

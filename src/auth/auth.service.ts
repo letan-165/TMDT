@@ -5,9 +5,7 @@ import { UsersService } from '@/users/users.service';
 import { JwtTokenService } from 'utils/jwt-token.service';
 import { ConfigService } from '@nestjs/config';
 import { OAuth2Client } from 'google-auth-library';
-
-
-
+import { CreateUserDto } from '@/users/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -31,8 +29,8 @@ export class AuthService {
     return user;
   }
 
-  async handleRegister(createAuthDto: any) {
-    return await this.userService.register(createAuthDto);
+  async handleRegister(createUserDto: CreateUserDto) {
+    return await this.userService.register(createUserDto);
   }
 
 
@@ -139,6 +137,21 @@ export class AuthService {
       };
     } catch (error) {
       throw new UnauthorizedException('Google token verification failed');
+    }
+  }
+
+  async refreshToken(user: any, res: Response) {
+    try {
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+      const token = await this.jwtTokenService.login(user, res);
+      if (!token) {
+        throw new UnauthorizedException('Failed to refresh token');
+      }
+      return token;
+    } catch (error) {
+      throw new UnauthorizedException('Error occurred while refreshing token');
     }
   }
 }

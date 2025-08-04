@@ -1,4 +1,3 @@
-
 import { User } from '@/users/schemas/user.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
@@ -9,10 +8,10 @@ export type ProductDocument = HydratedDocument<Product>;
 @Schema({ timestamps: true })
 export class Product {
   @Prop({ type: Types.ObjectId, ref: 'Category', required: true })
-  categoryID: Category;
+  categoryId: Category;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'User'})
-  sellerID: User;
+  sellerId: User;
 
   @Prop({ required: true })
   name: string;
@@ -23,7 +22,7 @@ export class Product {
   @Prop()
   image?: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true , default: 0 })
   price: number;
 
   @Prop({ default: 0 })

@@ -15,13 +15,14 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { GetProductsQueryDto } from './dto/get-products-query.dto';
-import { StockUpdateDto } from './interfaces/product.interface';
+import { Public } from '@/auth/decorator/public';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) { }
 
   @Post()
+  @Public()
   @HttpCode(HttpStatus.CREATED)
   create(@Body(ValidationPipe) createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
@@ -76,13 +77,13 @@ export class ProductsController {
     return this.productsService.update(id, updateProductDto);
   }
 
-  @Patch(':id/stock')
-  updateStock(
-    @Param('id') id: string,
-    @Body(ValidationPipe) stockUpdateDto: StockUpdateDto
-  ) {
-    return this.productsService.updateStockAdvanced(id, stockUpdateDto);
-  }
+  // @Patch(':id/stock')
+  // updateStock(
+  //   @Param('id') id: string,
+  //   @Body(ValidationPipe) stockUpdateDto: StockUpdateDto
+  // ) {
+  //   return this.productsService.updateStockAdvanced(id, stockUpdateDto);
+  // }
 
   @Patch(':id/toggle-status')
   toggleProductStatus(@Param('id') id: string) {
