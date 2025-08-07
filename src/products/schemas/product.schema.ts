@@ -20,7 +20,7 @@ export class Product {
   description?: string;
 
   @Prop()
-  image?: string;
+  images?: [string];
 
   @Prop({ required: true , default: 0 })
   price: number;
@@ -30,7 +30,6 @@ export class Product {
 
   @Prop({ default: true })
   status: boolean;
-
   
 }
 

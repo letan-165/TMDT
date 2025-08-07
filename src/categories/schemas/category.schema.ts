@@ -1,4 +1,5 @@
 
+import { Product } from '@/products/schemas/product.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 

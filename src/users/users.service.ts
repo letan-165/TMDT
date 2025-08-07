@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Model } from 'mongoose';
@@ -11,10 +11,9 @@ import { SendMailService } from '@/send-mail/send-mail.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UpdateUsersAdminDto } from './dto/update-users-admin.dto';
-import { instanceToPlain } from 'class-transformer';
 import aqp from 'api-query-params';
 @Injectable()
-export class UsersService {
+export class UsersService implements OnModuleInit{
   constructor(@InjectModel(User.name) private userModel: Model<User>,
     private mailService: SendMailService,
     private jwtService: JwtService,
@@ -46,11 +45,9 @@ export class UsersService {
 
   }
 
-  async InitAdmin() {
+  async onModuleInit() {
     const adminExists = await this.userModel.findOne({ role: 'ADMIN' });
-    if (adminExists) {
-      return { message: 'Admin user already exists' };
-    }
+    if (adminExists) return;
     const passDefault = await hashPassword(this.configService.get<string>('DEFAULT_ADMIN_PASSWORD')!);
     const newUser = new this.userModel({
       username: 'admin',
@@ -61,9 +58,7 @@ export class UsersService {
       role: 'ADMIN',
     });
     await newUser.save();
-    return {
-      _id: newUser._id
-    }
+    console.log('Tài khoản admin đã được tạo thành công: username: admin, password: ' + this.configService.get<string>('DEFAULT_ADMIN_PASSWORD'));
   }
 
   async createAdmin(createUserDto: CreateUserDto) {
@@ -124,7 +119,7 @@ export class UsersService {
     if (!email) {
       throw new Error('Email is required');
     }
-    const user = await this.userModel.findOne({ email });
+    const user = await this.userModel.findOne({ email }).lean();
     if (user) {
       return true;
     }
@@ -135,7 +130,7 @@ export class UsersService {
     if (!username) {
       throw new Error('Username is required');
     }
-    const user = await this.userModel.findOne({ username });
+    const user = await this.userModel.findOne({ username }).lean();
     if (!user) {
       return null;
     }
@@ -238,24 +233,22 @@ export class UsersService {
     if (!current) current = 1;
     if (!pageSize) pageSize = 10;
 
-    const totalItems = (await this.userModel.find(filter)).length;
+    const totalItems = await this.userModel.countDocuments(filter);
     const totalPages = Math.ceil(totalItems / pageSize); 
     const skip = (current - 1) * pageSize;
-    const users = await this.userModel.find(filter).sort(sort as any).skip(skip).limit(pageSize).exec();
-
-    const results = instanceToPlain(users);
-    return { results, totalPages };
+    const users = await this.userModel.find(filter).sort(sort as any).skip(skip).limit(pageSize).lean();
+    return { users, totalPages };
   }
 
   async findOne(id: string) {
     if (!id) {
       throw new Error('User ID is required');
     }
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel.findById(id).lean();
     if (!user) {
       throw new Error('User not found');
     }
-    return instanceToPlain(user);
+    return user;
   }
 
   async remove(id: string) {

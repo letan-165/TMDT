@@ -25,6 +25,9 @@ export class User {
   @Prop()
   avatar?: string;
 
+  @Prop()
+  address?: string;
+
   @Prop({ default: 'USER' })
   role: string;
 

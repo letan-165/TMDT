@@ -1,25 +1,42 @@
-import { IsMongoId, IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsString, IsNumber, IsOptional, IsDateString, Min, IsBoolean } from 'class-validator';
 
 export class CreateDiscountDto {
     @IsNotEmpty()
-    @IsMongoId()
-    sellerId: string;
+    @IsString()
+    code: string;
 
     @IsNotEmpty()
+    @IsString()
     type: string;
 
     @IsNotEmpty()
+    @IsNumber()
+    @Min(0)
     value: number;
-    
+
     @IsNotEmpty()
+    @IsNumber()
+    @Min(1)
     quantity: number;
 
-    @IsNotEmpty()
-    minOrder: number;
+    @IsOptional()
+    @IsNumber()
+    @Min(0)
+    minOrder?: number;
+
+    @IsOptional()
+    @IsNumber()
+    maxDiscount?: number;
 
     @IsNotEmpty()
-    maxDiscount: number;
+    @IsDateString()
+    startDate: string;
 
     @IsNotEmpty()
-    expiryDate: Date;
+    @IsDateString()
+    expiryDate: string;
+
+    @IsNotEmpty()
+    @IsString()
+    sellerId: string;
 }

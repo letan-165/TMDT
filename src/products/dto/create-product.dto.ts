@@ -11,7 +11,7 @@ export class CreateProductDto {
     description?: string;
 
     @IsOptional()
-    image?: string;
+    images?: [string];
 
     @IsNumber()
     @Min(0)
@@ -22,11 +22,7 @@ export class CreateProductDto {
     @IsNumber()
     @Min(0)
     @Type(() => Number)
-    stock?: number = 0;
-
-    @IsOptional()
-    @IsBoolean()
-    status?: boolean;
+    stock: number;
 
     @IsMongoId()
     @IsNotEmpty()

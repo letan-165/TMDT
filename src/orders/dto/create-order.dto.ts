@@ -1,14 +1,34 @@
-import { CreateOrderDetailDto } from "@/order_details/dto/create-order_detail.dto";
-import { IsMongoId, IsNotEmpty } from "class-validator";
+import { IsArray, IsNotEmpty, IsNumber, IsString, Min, IsOptional } from "class-validator";
+
+export class OrderItem {
+    @IsNotEmpty()
+    @IsString()
+    productId: string;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Min(1)
+    quantity: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Min(0)
+    price: number;
+}
 
 export class CreateOrderDto {
     @IsNotEmpty()
-    @IsMongoId()
+    @IsString()
     userId: string;
 
     @IsNotEmpty()
-    totalAmount: number;
+    @IsString()
+    sellerId: string;
 
-    @IsNotEmpty()
-    orderDetails: CreateOrderDetailDto[];
+    @IsArray()
+    items: Array<OrderItem>;
+
+    @IsOptional()
+    @IsString()
+    discountCode?: string;
 }

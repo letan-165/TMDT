@@ -3,27 +3,34 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Types } from "mongoose";
 
 export type DiscountDocument = HydratedDocument<Discount>;
+
 @Schema({ timestamps: true })
 export class Discount {
-    @Prop({ required: true, type: Types.ObjectId, ref: 'User'})
+    @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
     sellerId: User;
 
-    @Prop()
+    @Prop({ required: true, unique: true })
+    code: string; 
+
+    @Prop({ required: true, enum: ['fixed', 'percentage'] })
     type: string;
 
-    @Prop()
+    @Prop({ required: true })
     value: number;
 
-    @Prop()
+    @Prop({ required: true, default: 1 })
     quantity: number;
 
-    @Prop()
+    @Prop({ default: 0 })
     minOrder: number;
 
     @Prop()
     maxDiscount: number;
 
-    @Prop()
+    @Prop({ required: true })
+    startDate: Date;
+
+    @Prop({ required: true })
     expiryDate: Date;
 }
 

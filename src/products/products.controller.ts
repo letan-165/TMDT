@@ -1,21 +1,9 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-  HttpCode,
-  HttpStatus,
-  ValidationPipe
-} from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, Query, Req, Patch, Delete} from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { GetProductsQueryDto } from './dto/get-products-query.dto';
 import { Public } from '@/auth/decorator/public';
+import { CreateProductDto } from './dto/create-product.dto';
+import { Role } from '@/auth/enum/role.enum';
+import { Roles } from '@/auth/decorator/roles.decorator';
 
 @Controller('products')
 export class ProductsController {
@@ -23,37 +11,14 @@ export class ProductsController {
 
   @Post()
   @Public()
-  @HttpCode(HttpStatus.CREATED)
-  create(@Body(ValidationPipe) createProductDto: CreateProductDto) {
+  create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
 
   @Get()
-  findAll(@Query(ValidationPipe) query: GetProductsQueryDto) {
-    return this.productsService.findAll(query);
-  }
-
-  @Get('search')
-  search(@Query('q') searchTerm: string, @Query('limit') limit: number = 10) {
-    return this.productsService.searchProducts(searchTerm, limit);
-  }
-
-  @Get('featured')
-  getFeaturedProducts(@Query('limit') limit: number = 10) {
-    return this.productsService.getFeaturedProducts(limit);
-  }
-
-  @Get('low-stock')
-  getLowStockProducts(@Query('threshold') threshold: number = 10) {
-    return this.productsService.getLowStockProducts(threshold);
-  }
-
-  @Get('category/:categoryId')
-  getProductsByCategory(
-    @Param('categoryId') categoryId: string,
-    @Query('limit') limit?: number
-  ) {
-    return this.productsService.getProductsByCategory(categoryId, limit);
+  @Public()
+  findAll(@Query() query: string, @Query('current') current: number, @Query('pageSize') pageSize: number) {
+    return this.productsService.findAll(query, current, pageSize);
   }
 
   @Get(':id')
@@ -61,37 +26,25 @@ export class ProductsController {
     return this.productsService.findOne(id);
   }
 
-  @Get(':id/related')
-  getRelatedProducts(
-    @Param('id') id: string,
-    @Query('limit') limit: number = 5
-  ) {
-    return this.productsService.getRelatedProducts(id, limit);
+  @Public()
+  @Roles(Role.SELLER)
+  @Get('seller')
+  findOneBySeller(@Req() req) {
+    const sellerId = req.user.id;
+    return this.productsService.findOneBySeller(sellerId);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body(ValidationPipe) updateProductDto: UpdateProductDto
-  ) {
-    return this.productsService.update(id, updateProductDto);
+  @Patch('admin/:id')
+  update(@Param('id') id: string, @Body() updateProductDto: any) {
+    return this.productsService.updateProductAdmin(id, updateProductDto);
   }
 
-  // @Patch(':id/stock')
-  // updateStock(
-  //   @Param('id') id: string,
-  //   @Body(ValidationPipe) stockUpdateDto: StockUpdateDto
-  // ) {
-  //   return this.productsService.updateStockAdvanced(id, stockUpdateDto);
-  // }
-
-  @Patch(':id/toggle-status')
-  toggleProductStatus(@Param('id') id: string) {
-    return this.productsService.toggleProductStatus(id);
+  @Patch('seller/:id')
+  updateProduct(@Param('id') id: string, @Body() updateProductDto: any) {
+    return this.productsService.updateProductSeller(id, updateProductDto);
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.OK)
   remove(@Param('id') id: string) {
     return this.productsService.remove(id);
   }

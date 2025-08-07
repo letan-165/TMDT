@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn hàng mới - {{brand}}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            max-width: 150px;
+            height: auto;
+        }
+
+        .order-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .order-items {
+            margin: 20px 0;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .item-details {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .item-total {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .total-section {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .customer-info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background: #218838;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            {{#if url}}
+            <img src="{{url}}" alt="{{brand}}" class="logo">
+            {{/if}}
+            <h1 style="color: #007bff; margin: 10px 0;">🛍️ Đơn hàng mới!</h1>
+            <p style="margin: 0; color: #666;">Bạn có đơn hàng mới cần xử lý</p>
+        </div>
+
+        <div class="highlight">
+            <strong>📢 Thông báo:</strong> Có sản phẩm của bạn trong đơn hàng mới #{{orderNumber}}
+        </div>
+
+        <div class="order-info">
+            <h3 style="margin-top: 0; color: #333;">📋 Thông tin đơn hàng</h3>
+            <p><strong>Mã đơn hàng:</strong> #{{orderNumber}}</p>
+            <p><strong>Ngày đặt:</strong> {{orderDate}}</p>
+            <p><strong>Trạng thái:</strong> <span style="color: #ffc107; font-weight: bold;">{{status}}</span></p>
+            <p><strong>Phương thức thanh toán:</strong> {{paymentMethod}}</p>
+        </div>
+
+        <div class="customer-info">
+            <h3 style="margin-top: 0; color: #333;">👤 Thông tin khách hàng</h3>
+            <p><strong>Tên:</strong> {{customerName}}</p>
+            <p><strong>Email:</strong> {{customerEmail}}</p>
+            {{#if customerPhone}}
+            <p><strong>Số điện thoại:</strong> {{customerPhone}}</p>
+            {{/if}}
+            {{#if shippingAddress}}
+            <p><strong>Địa chỉ giao hàng:</strong> {{shippingAddress}}</p>
+            {{/if}}
+        </div>
+
+        <div class="order-items">
+            <h3 style="color: #333;">📦 Sản phẩm của bạn trong đơn hàng:</h3>
+            {{#each sellerItems}}
+            <div class="item">
+                <div class="item-info">
+                    <div class="item-name">{{name}}</div>
+                    <div class="item-details">
+                        Số lượng: {{quantity}} × {{formatPrice price}} = {{formatPrice total}}
+                    </div>
+                </div>
+                <div class="item-total">{{formatPrice total}}</div>
+            </div>
+            {{/each}}
+        </div>
+
+        <div class="total-section">
+            <h3 style="margin: 0;">💰 Tổng giá trị sản phẩm của bạn: {{formatPrice sellerTotal}}</h3>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{adminUrl}}/orders/{{orderNumber}}" class="btn">
+                🔍 Xem chi tiết đơn hàng
+            </a>
+            <a href="{{adminUrl}}/orders/{{orderNumber}}/confirm" class="btn" style="background: #007bff;">
+                ✅ Xác nhận đơn hàng
+            </a>
+        </div>
+
+        <div class="highlight">
+            <strong>⚡ Hành động cần thực hiện:</strong>
+            <ul style="margin: 10px 0; padding-left: 20px;">
+                <li>Kiểm tra tình trạng kho hàng</li>
+                <li>Xác nhận đơn hàng trong vòng 24h</li>
+                <li>Chuẩn bị hàng và đóng gói</li>
+                <li>Cập nhật trạng thái đơn hàng</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>Email này được gửi tự động từ hệ thống {{brand}}</p>
+            <p>Vui lòng không reply email này. Nếu cần hỗ trợ, hãy liên hệ qua trang quản trị.</p>
+            {{#if policy}}
+            <p><a href="{{policy}}" style="color: #007bff;">Chính sách bảo mật</a></p>
+            {{/if}}
+        </div>
+    </div>
+</body>
+
+</html>

@@ -7,9 +7,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
-import { OrdersModule } from './orders/orders.module';
-import { OrderDetailsModule } from './order_details/order_details.module';
-
 import { StatsModule } from './stats/stats.module';
 import { AuthModule } from './auth/auth.module';
 import { SendMailModule } from './send-mail/send-mail.module';
@@ -22,6 +19,7 @@ import { JwtAuthGuard } from './auth/guard/jwt-auth.guard';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -38,8 +36,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
     UsersModule,
     ProductsModule,
     CategoriesModule,
-    OrdersModule,
-    OrderDetailsModule,
     StatsModule,
     AuthModule,
     SendMailModule,
@@ -57,27 +53,35 @@ import { MailerModule } from '@nestjs-modules/mailer';
             user: configService.get<string>('MAIL_USER'),
             pass: configService.get<string>('MAIL_PASSWORD'),
           },
-        }, 
+        },
         defaults: {
           from: `${configService.get<string>('BRAND_NAME')} <no-reply@localhost>`
         },
         //preview: true,
         template: {
           dir: join(__dirname, 'send-mail/templates'),
-          adapter: new HandlebarsAdapter(),
+          adapter: new HandlebarsAdapter({
+            formatPrice: (price: number) => {
+              return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+              }).format(price);
+            }
+          }),
           options: {
             strict: true,
           },
         },
       }), inject: [ConfigService],
     }),
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [
-    AppService,{
+    AppService, {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
-    },{
+    }, {
       provide: APP_GUARD,
       useClass: RolesGuard,
     }

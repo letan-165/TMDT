@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { DiscountService } from './discount.service';
 import { CreateDiscountDto } from './dto/create-discount.dto';
 import { UpdateDiscountDto } from './dto/update-discount.dto';
 
 @Controller('discount')
 export class DiscountController {
-  constructor(private readonly discountService: DiscountService) {}
+  constructor(private readonly discountService: DiscountService) { }
 
   @Post()
   async create(@Body() createDiscountDto: CreateDiscountDto) {
@@ -13,8 +13,8 @@ export class DiscountController {
   }
 
   @Get()
-  async findAll() {
-    return await this.discountService.findAll();
+  async findAll(@Query('query') query: string, @Query('current') current: number, @Query('pageSize') pageSize: number) {
+    return await this.discountService.findAll(query, current, pageSize);
   }
 
   @Get(':id')
@@ -32,5 +32,5 @@ export class DiscountController {
     return await this.discountService.remove(id);
   }
 
-  
+
 }
