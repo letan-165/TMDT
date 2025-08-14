@@ -55,57 +55,32 @@ export class DiscountService {
     }
   }
 
-  // Method đơn giản để áp dụng discount
-  // async applyDiscount(discountCode: string, sellerId: string, totalAmount: number) {
-  //   try {
-  //     // Tìm discount theo code và sellerId
-  //     const discount = await this.discountModel.findOne({
-  //       code: discountCode,
-  //       sellerId: sellerId
-  //     }).lean();
+  async getAvailableDiscounts(sellerId: string, orderTotal: number) {
+    try {
+      const discounts = await this.discountModel.find({
+        sellerId,
+        quantity: { $gt: 0 },
+        startDate: { $lte: new Date() },
+        expiryDate: { $gte: new Date() },
+        minOrder: { $lte: orderTotal },
+      }).lean();
+      return discounts;
+    } catch (error) {
+      throw new Error(`Không thể lấy danh sách mã giảm giá: ${error.message}`);
+    }
+  }
 
-  //     // Nếu không tìm thấy, trả về không có discount
-  //     if (!discount) {
-  //       return {
-  //         success: false,
-  //         discountAmount: 0,
-  //         finalAmount: totalAmount,
-  //         message: 'Mã giảm giá không tồn tại'
-  //       };
-  //     }
-
-  //     // Tính discount amount đơn giản
-  //     let discountAmount = 0;
-  //     if (discount.type === 'fixed') {
-  //       discountAmount = Math.min(discount.value, totalAmount);
-  //     } else if (discount.type === 'percentage') {
-  //       discountAmount = (totalAmount * discount.value) / 100;
-  //       if (discount.maxDiscount && discountAmount > discount.maxDiscount) {
-  //         discountAmount = discount.maxDiscount;
-  //       }
-  //     }
-
-  //     const finalAmount = totalAmount - discountAmount;
-
-  //     return {
-  //       success: true,
-  //       discountId: discount._id,
-  //       discountCode: discount.code,
-  //       discountAmount: discountAmount,
-  //       finalAmount: finalAmount,
-  //       message: 'Áp dụng mã giảm giá thành công'
-  //     };
-
-  //   } catch (error) {
-  //     console.error('Error applying discount:', error);
-  //     return {
-  //       success: false,
-  //       discountAmount: 0,
-  //       finalAmount: totalAmount,
-  //       message: 'Có lỗi khi áp dụng mã giảm giá'
-  //     };
-  //   }
-  // }
+  async findOneBySeller(id: string) {
+    try {
+      const discounts = await this.discountModel.find({ sellerId: id}).lean()
+      if (!discounts) {
+        throw new Error(`Không tìm thấy mã giảm giá cho người bán với ID ${id}`);
+      }
+      return discounts;
+    } catch (error) {
+      throw new Error(`Không thể lấy thông tin mã giảm giá: ${error.message}`);
+    }
+  }
 
   async update(id: string, updateDiscountDto: UpdateDiscountDto) {
     try {

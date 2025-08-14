@@ -116,48 +116,7 @@ export class ProductsService {
       throw new Error(`Không thể cập nhật sản phẩm: ${error.message}`);
     }
   }
-
-  async decreaseStock(
-    items: { productId: string; quantity: number }[],
-    session?: ClientSession,
-  ) {
-    const updatedProducts: string[] = [];
-
-    for (const item of items) {
-      if (!Types.ObjectId.isValid(item.productId)) {
-        throw new BadRequestException(`ID sản phẩm không hợp lệ: ${item.productId}`);
-      }
-      const res = await this.productModel.updateOne(
-        { _id: item.productId, stock: { $gte: item.quantity } },
-        {
-          $inc: { stock: -item.quantity },
-          $set: { lastStockUpdate: new Date() },
-        },
-        session ? { session } : {},
-      );
-      if (res.modifiedCount === 0) {
-        throw new BadRequestException(`Không đủ hàng trong kho cho sản phẩm ${item.productId}`);
-      }
-      updatedProducts.push(item.productId);
-    }
-
-    return updatedProducts;
-  }
-
-  async groupProductsBySeller(items: OrderItem[]) {
-    const products = await this.productModel.find({ _id: { $in: items.map(item => item.productId) } })
-    const itemsBySeller = new Map();
-
-    products.forEach(product => {
-      const sellerId = product.sellerId.toString();
-      if (!itemsBySeller.has(sellerId)) {
-        itemsBySeller.set(sellerId, []);
-      }
-      itemsBySeller.get(sellerId).push(product);
-    });
-    return itemsBySeller;
-  }
-
+  
   async remove(id: string) {
     try {
       if (!Types.ObjectId.isValid(id)) {
@@ -171,14 +130,10 @@ export class ProductsService {
       if (!deletedProduct) {
         throw new NotFoundException('Không tìm thấy sản phẩm');
       }
-
       return {
         message: 'Xóa sản phẩm thành công',
       };
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
       throw new Error(`Không thể xóa sản phẩm: ${error.message}`);
     }
   }
