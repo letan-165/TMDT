@@ -6,24 +6,32 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Product, ProductDocument } from './schemas/product.schema';
 import aqp from 'api-query-params';
 import { UpdateProductSellerDto } from './dto/update-product-seller.dto';
-import { OrderItem } from '@/orders/dto/create-order.dto';
+import { DiscountService } from '@/discount/discount.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
+    private discountService: DiscountService,
   ) { }
 
   async create(createProductDto: CreateProductDto) {
     try {
       const newProduct = new this.productModel(createProductDto);
       const savedProduct = await newProduct.save();
-      await savedProduct.populate('categoryId', 'name description');
+      (await savedProduct.populate('categoryId', 'name description')).populate('discountId', 'code value');
+      const finalPrice = await this.discountService.calculateFinalPrice(savedProduct.price, createProductDto.discountId);
+      if (finalPrice < savedProduct.price) {
+        savedProduct.finalPrice = finalPrice;
+        savedProduct.haveDiscount = true;
+      }
       return savedProduct;
     } catch (error) {
       throw new Error(`Không thể tạo sản phẩm: ${error.message}`);
     }
   }
+
+  
 
   async findAll(query: string, current: number, pageSize: number) {
     const { filter, sort } = aqp(query);
@@ -42,7 +50,7 @@ export class ProductsService {
       .sort(sort as any)
       .skip(skip)
       .limit(pageSize)
-      .populate('categoryId', 'name description').lean();
+      .populate('categoryId', 'name description').populate('discountId', 'code value').lean();
     return { products, totalPages };
   }
 
@@ -76,7 +84,7 @@ export class ProductsService {
     }
   }
 
-  async updateProductAdmin(id: string, updateProductDto: UpdateProductSellerDto) {
+  async updateProductAdmin(id: string, updateProductDto: UpdateProductDto) {
     try {
       if (!Types.ObjectId.isValid(id)) {
         throw new NotFoundException('ID sản phẩm không hợp lệ');
@@ -98,17 +106,28 @@ export class ProductsService {
     }
   }
 
-  async updateProductSeller(id: string, updateProductDto: UpdateProductDto) {
+  async updateProductSeller(id: string, updateProductDto: UpdateProductSellerDto) {
     try {
       if (!Types.ObjectId.isValid(id)) {
         throw new NotFoundException('ID sản phẩm không hợp lệ');
       }
+      if (updateProductDto.discountId) {
+        const discount = await this.discountService.findOneBySeller(updateProductDto.discountId);
+        if (!discount) {
+          throw new BadRequestException('Mã giảm giá không hợp lệ');
+        }
+      }
 
       const updatedProduct = await this.productModel.findByIdAndUpdate(
         id, updateProductDto, { new: true }
-      ).populate('categoryId', 'name description').exec();
+      ).populate('categoryId', 'name description').populate('discountId', 'code value').exec();
       if (!updatedProduct) {
         throw new NotFoundException('Không tìm thấy sản phẩm');
+      }
+      const finalPrice = await this.discountService.calculateFinalPrice(updatedProduct.price, updateProductDto.discountId);
+      if (finalPrice < updatedProduct.price) {
+        updatedProduct.finalPrice = finalPrice;
+        updatedProduct.haveDiscount = true;
       }
       return updatedProduct;
     }

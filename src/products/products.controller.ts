@@ -4,6 +4,8 @@ import { Public } from '@/auth/decorator/public';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Role } from '@/auth/enum/role.enum';
 import { Roles } from '@/auth/decorator/roles.decorator';
+import { UpdateProductSellerDto } from './dto/update-product-seller.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -35,12 +37,12 @@ export class ProductsController {
   }
 
   @Patch('admin/:id')
-  update(@Param('id') id: string, @Body() updateProductDto: any) {
+  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductSellerDto) {
     return this.productsService.updateProductAdmin(id, updateProductDto);
   }
 
   @Patch('seller/:id')
-  updateProduct(@Param('id') id: string, @Body() updateProductDto: any) {
+  updateProduct(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.updateProductSeller(id, updateProductDto);
   }
 

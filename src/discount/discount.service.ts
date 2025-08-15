@@ -70,6 +70,15 @@ export class DiscountService {
     }
   }
 
+  async calculateFinalPrice(price: number, discountId?: string) {
+    if (!discountId) return price;
+
+    const discount = await this.discountModel.findById(discountId);
+    if (!discount) 
+      throw new Error('Không tìm thấy mã giảm giá');
+    return price - (price * discount.value) / 100;
+  }
+
   async findOneBySeller(id: string) {
     try {
       const discounts = await this.discountModel.find({ sellerId: id}).lean()

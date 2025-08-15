@@ -1,3 +1,4 @@
+import { Discount } from '@/discount/schemas/discount.schema';
 import { User } from '@/users/schemas/user.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
@@ -25,12 +26,20 @@ export class Product {
   @Prop({ required: true , default: 0 })
   price: number;
 
+  @Prop()
+  finalPrice?: number;
+
+  @Prop({ default: false })
+  haveDiscount: boolean;
+
   @Prop({ default: 0 })
   stock: number;
 
   @Prop({ default: true })
   status: boolean;
   
+  @Prop({ type: Types.ObjectId, ref: 'Discount' })
+  discountId?: Discount;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

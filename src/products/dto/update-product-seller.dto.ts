@@ -26,4 +26,9 @@ export class UpdateProductSellerDto {
     @IsOptional()
     @IsString()
     categoryId?: string;
+
+    @IsOptional()
+    @IsString()
+    discountId?: string;
+
 }

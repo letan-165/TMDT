@@ -24,11 +24,12 @@ export class CreateProductDto {
     @Type(() => Number)
     stock: number;
 
-    @IsMongoId()
     @IsNotEmpty()
     categoryId: string;
 
-    @IsMongoId()
+    @IsOptional()
+    discountId?: string;
+
     @IsNotEmpty()
     sellerId: string;
 }
