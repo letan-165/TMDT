@@ -10,4 +10,8 @@ export class UpdateUserDto extends OmitType(CreateUserDto, ['username'] as const
   @IsString()
   @IsOptional()
   address?: string;
+
+  @IsString()
+  @IsOptional()
+  phone?: string;
 }

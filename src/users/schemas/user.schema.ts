@@ -28,6 +28,9 @@ export class User {
   @Prop()
   address?: string;
 
+  @Prop()
+  phone?: string;
+
   @Prop({ default: 'USER' })
   role: string;
 

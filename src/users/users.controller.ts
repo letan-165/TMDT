@@ -9,7 +9,7 @@ export class UsersController {
 
   @Patch('update/profile')
   async updateProfile(@Req() req, @Body() updateUserDto: UpdateUserDto) {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     return await this.usersService.updateProfile(userId, updateUserDto);
   }
 
