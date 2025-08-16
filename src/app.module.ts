@@ -19,6 +19,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from 'path';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { OrdersModule } from './orders/orders.module';
+import { StoreModule } from './store/store.module';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { OrdersModule } from './orders/orders.module';
       }), inject: [ConfigService],
     }),
     OrdersModule,
+    StoreModule,
   ],
   controllers: [AppController],
   providers: [

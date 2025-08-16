@@ -18,14 +18,19 @@ export class ProductsService {
   async create(createProductDto: CreateProductDto) {
     try {
       const newProduct = new this.productModel(createProductDto);
-      const savedProduct = await newProduct.save();
-      (await savedProduct.populate('categoryId', 'name description')).populate('discountId', 'code value');
-      const finalPrice = await this.discountService.calculateFinalPrice(savedProduct.price, createProductDto.discountId);
-      if (finalPrice < savedProduct.price) {
-        savedProduct.finalPrice = finalPrice;
-        savedProduct.haveDiscount = true;
+      const finalPrice = await this.discountService.calculateFinalPrice(newProduct.price, createProductDto.discountId);
+      if (finalPrice < newProduct.price) {
+        newProduct.finalPrice = finalPrice;
+        newProduct.haveDiscount = true;
       }
-      return savedProduct;
+      else {
+        newProduct.finalPrice = newProduct.price;
+        newProduct.haveDiscount = false;
+      }
+      await newProduct.save();
+      await newProduct.populate('categoryId', 'name description');
+      await newProduct.populate('discountId', 'code value');
+      return newProduct;
     } catch (error) {
       throw new Error(`Không thể tạo sản phẩm: ${error.message}`);
     }
@@ -111,24 +116,19 @@ export class ProductsService {
       if (!Types.ObjectId.isValid(id)) {
         throw new NotFoundException('ID sản phẩm không hợp lệ');
       }
-      if (updateProductDto.discountId) {
-        const discount = await this.discountService.findOneBySeller(updateProductDto.discountId);
-        if (!discount) {
-          throw new BadRequestException('Mã giảm giá không hợp lệ');
-        }
-      }
-
-      const updatedProduct = await this.productModel.findByIdAndUpdate(
-        id, updateProductDto, { new: true }
-      ).populate('categoryId', 'name description').populate('discountId', 'code value').exec();
+      const finalPrice = await this.discountService.calculateFinalPrice(updateProductDto.price!, updateProductDto.discountId);
+      const updatedProduct = await this.productModel.findByIdAndUpdate(id, updateProductDto, { new: true });
       if (!updatedProduct) {
         throw new NotFoundException('Không tìm thấy sản phẩm');
       }
-      const finalPrice = await this.discountService.calculateFinalPrice(updatedProduct.price, updateProductDto.discountId);
       if (finalPrice < updatedProduct.price) {
         updatedProduct.finalPrice = finalPrice;
         updatedProduct.haveDiscount = true;
+      } else {
+        updatedProduct.finalPrice = updatedProduct.price;
+        updatedProduct.haveDiscount = false;
       }
+      await updatedProduct.save();
       return updatedProduct;
     }
     catch (error) {

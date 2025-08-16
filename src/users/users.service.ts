@@ -45,6 +45,19 @@ export class UsersService implements OnModuleInit{
 
   }
 
+  async registerAsSeller(userId: string) {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    user.role = 'SELLER';
+    await user.save();
+    return user;
+  }
+
   async onModuleInit() {
     const adminExists = await this.userModel.findOne({ role: 'ADMIN' });
     if (adminExists) return;
