@@ -20,11 +20,6 @@ export class CartsController {
     return await this.cartsService.findCartByUserId(req.user.userId);
   }
 
-  @Patch(':id')
-  @Public()
-  async update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
-    return await this.cartsService.update(id, updateCartDto);
-  }
 
   @Get()
   @Public()

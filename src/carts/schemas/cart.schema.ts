@@ -1,4 +1,4 @@
-import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
 export type CartDocument = HydratedDocument<Cart>;
@@ -12,6 +12,9 @@ export class Cart {
         productId: { type: Types.ObjectId, ref: 'Product', required: true },
         quantity: { type: Number, required: true, default: 1, min: 1 }
     }])
-    items: { productId: Types.ObjectId; quantity: number }[];
+    items: Array<{
+        productId: Types.ObjectId;
+        quantity: number;
+    }>;
 }
 export const CartSchema = SchemaFactory.createForClass(Cart);

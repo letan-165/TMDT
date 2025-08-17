@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { StoreController } from './store.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Store, StoreSchema } from './entities/store.entity';
+import { Store, StoreSchema } from './schemas/store.schema';
 import { UsersModule } from '@/users/users.module';
 
 @Module({
@@ -10,4 +10,4 @@ import { UsersModule } from '@/users/users.module';
   controllers: [StoreController],
   providers: [StoreService],
 })
-export class StoreModule {}
+export class StoreModule { }

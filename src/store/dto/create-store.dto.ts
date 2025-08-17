@@ -8,9 +8,6 @@ export class CreateStoreDto {
     name: string;
 
     @IsNotEmpty()
-    phone: string;
-
-    @IsNotEmpty()
     address: string;
 }
 

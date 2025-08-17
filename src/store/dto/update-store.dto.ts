@@ -1,5 +1,5 @@
 
 import { CreateStoreDto } from './create-store.dto';
-import { OmitType } from '@nestjs/mapped-types';
+import { OmitType, PartialType } from '@nestjs/mapped-types';
 
-export class UpdateStoreDto extends OmitType(CreateStoreDto, ['userId']) {}
+export class UpdateStoreDto extends PartialType(OmitType(CreateStoreDto, ['userId'])) {}

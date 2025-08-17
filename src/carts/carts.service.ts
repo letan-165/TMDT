@@ -16,13 +16,12 @@ export class CartsService {
       const existingCart = await this.cartModel.findOne({ userId: userId });
       if (existingCart) {
         for (const item of items) {
-          const productIdObj = new Types.ObjectId(item.productId);
           const existingItem = existingCart.items.findIndex((cartItem) => cartItem.productId.toString() === item.productId.toString());
           if (existingItem !== -1) {
             existingCart.items[existingItem].quantity += item.quantity;
           } else {
             existingCart.items.push({
-              productId: productIdObj,
+              productId: new Types.ObjectId(item.productId),
               quantity: item.quantity
             });
           }
@@ -56,9 +55,12 @@ export class CartsService {
     }
   }
 
-  async findCartByUserId(userId: string){
+  async findCartByUserId(userId: string) {
     try {
-      const cart = await this.cartModel.findOne({ userId}).populate('items.productId');
+      if (!Types.ObjectId.isValid(userId)) {
+        throw new Error('Invalid user ID');
+      }
+      const cart = await this.cartModel.findOne({ userId }).populate('items.productId', 'name price');
       if (!cart) {
         throw new Error(`Cart for user with ID ${userId} not found`);
       }
@@ -67,31 +69,16 @@ export class CartsService {
       throw new Error('Error finding cart');
     }
   }
-
   async update(id: string, updateCartDto: UpdateCartDto) {
     try {
-      const cart = await this.cartModel.findById(id);
-      if (!cart) {
+      const updatedCart = await this.cartModel.findByIdAndUpdate(id, updateCartDto, { new: true });
+      if (!updatedCart) {
         throw new Error(`Cart with ID ${id} not found`);
       }
-      const { items } = updateCartDto;
-      for (const item of items) {
-        const productIdObj = new Types.ObjectId(item.productId);
-        const existingItemIndex = cart.items.findIndex((cartItem) => cartItem.productId.toString() === item.productId.toString());
-        if (existingItemIndex !== -1) {
-          cart.items[existingItemIndex].quantity = item.quantity;
-        } else {
-          cart.items.push({
-            productId: productIdObj,
-            quantity: item.quantity
-          });
-        }
-      }
-      return await cart.save();
+      return updatedCart;
     } catch (error) {
       throw new Error('Error updating cart');
     }
-    
   }
 
   async removeProductFromCart(cartId: string, productId: string) {
@@ -107,6 +94,6 @@ export class CartsService {
     }
   }
 
-  
+
 
 }

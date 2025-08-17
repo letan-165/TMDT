@@ -55,18 +55,19 @@ export class DiscountService {
     }
   }
 
-  async getAvailableDiscounts(sellerId: string, orderTotal: number) {
+  async getAvailableDiscounts(sellerId: string) {
     try {
       const discounts = await this.discountModel.find({
-        sellerId,
-        quantity: { $gt: 0 },
+        sellerId: new Types.ObjectId(sellerId),
         startDate: { $lte: new Date() },
-        expiryDate: { $gte: new Date() },
-        minOrder: { $lte: orderTotal },
+        endDate: { $gte: new Date() },
       }).lean();
+      if (!discounts || discounts.length === 0) {
+        throw new Error('Không có mã giảm giá khả dụng');
+      }
       return discounts;
     } catch (error) {
-      throw new Error(`Không thể lấy danh sách mã giảm giá: ${error.message}`);
+      throw new Error(`Không thể lấy mã giảm giá khả dụng: ${error.message}`);
     }
   }
 

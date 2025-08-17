@@ -2,9 +2,6 @@ import {Body, Controller, Get, Param, Post, Query, Req, Patch, Delete} from '@ne
 import { ProductsService } from './products.service';
 import { Public } from '@/auth/decorator/public';
 import { CreateProductDto } from './dto/create-product.dto';
-import { Role } from '@/auth/enum/role.enum';
-import { Roles } from '@/auth/decorator/roles.decorator';
-import { UpdateProductSellerDto } from './dto/update-product-seller.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
@@ -24,26 +21,26 @@ export class ProductsController {
   }
 
   @Get(':id')
+  @Public()
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(id);
   }
 
   @Public()
-  @Roles(Role.SELLER)
-  @Get('seller')
-  findOneBySeller(@Req() req) {
-    const sellerId = req.user.id;
-    return this.productsService.findOneBySeller(sellerId);
+  @Get('seller/:id')
+  findOneBySeller(@Param('id') id: string) {
+    return this.productsService.findOneBySeller(id);
   }
 
-  @Patch('admin/:id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductSellerDto) {
-    return this.productsService.updateProductAdmin(id, updateProductDto);
-  }
-
-  @Patch('seller/:id')
+  @Patch(':id')
   updateProduct(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.updateProductSeller(id, updateProductDto);
+    return this.productsService.updateProduct(id, updateProductDto);
+  }
+
+  @Patch('status/:id')
+  updateStatus(@Param('id') id: string, @Body('status') status: string) {
+    const statusBoolean = status === "true";
+    return this.productsService.updateStatus(id, statusBoolean);
   }
 
   @Delete(':id')

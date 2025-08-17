@@ -1,11 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ClientSession, Model, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product, ProductDocument } from './schemas/product.schema';
 import aqp from 'api-query-params';
-import { UpdateProductSellerDto } from './dto/update-product-seller.dto';
 import { DiscountService } from '@/discount/discount.service';
 
 @Injectable()
@@ -89,29 +88,7 @@ export class ProductsService {
     }
   }
 
-  async updateProductAdmin(id: string, updateProductDto: UpdateProductDto) {
-    try {
-      if (!Types.ObjectId.isValid(id)) {
-        throw new NotFoundException('ID sản phẩm không hợp lệ');
-      }
-      const updatedProduct = await this.productModel.findByIdAndUpdate(
-        id, updateProductDto, { new: true }
-      ).populate('categoryId', 'name description').exec();
-
-      if (!updatedProduct) {
-        throw new NotFoundException('Không tìm thấy sản phẩm');
-      }
-
-      return updatedProduct;
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new Error(`Không thể cập nhật sản phẩm: ${error.message}`);
-    }
-  }
-
-  async updateProductSeller(id: string, updateProductDto: UpdateProductSellerDto) {
+  async updateProduct(id: string, updateProductDto: UpdateProductDto) {
     try {
       if (!Types.ObjectId.isValid(id)) {
         throw new NotFoundException('ID sản phẩm không hợp lệ');
@@ -133,6 +110,43 @@ export class ProductsService {
     }
     catch (error) {
       throw new Error(`Không thể cập nhật sản phẩm: ${error.message}`);
+    }
+  }
+
+  async removeDiscountFromProduct(id: string) {
+    try {
+      if (!Types.ObjectId.isValid(id)) {
+        throw new NotFoundException('ID sản phẩm không hợp lệ');
+      }
+
+      const product = await this.productModel.findById(id);
+      if (!product) {
+        throw new NotFoundException('Không tìm thấy sản phẩm');
+      }
+
+      product.discountId = undefined;
+      product.finalPrice = product.price;
+      await product.save();
+      return {
+        message: 'xóa discount thành công'
+      }
+    } catch (error) {
+      throw new Error(`Không thể xóa discount: ${error.message}`);
+    }
+  }
+
+  async updateStatus(id: string, status: boolean) {
+    try {
+      if (!Types.ObjectId.isValid(id)) {
+        throw new NotFoundException('ID sản phẩm không hợp lệ');
+      }
+      const updatedProduct = await this.productModel.findByIdAndUpdate(id, { status }, { new: true });
+      if (!updatedProduct) {
+        throw new NotFoundException('Không tìm thấy sản phẩm');
+      }
+      return updatedProduct;
+    } catch (error) {
+      throw new Error(`Không thể cập nhật trạng thái sản phẩm: ${error.message}`);
     }
   }
   

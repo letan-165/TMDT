@@ -10,13 +10,10 @@ export class Store {
     name: string; 
 
     @Prop({ required: true })
-    phone: string;
-
-    @Prop({ required: true })
     address: string;
 
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-    user: User;
+    userId: User;
 
 }
 
