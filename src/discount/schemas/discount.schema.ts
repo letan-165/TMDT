@@ -11,12 +11,6 @@ export class Discount {
     @Prop({ required: true, unique: true })
     code: string; 
 
-    @Prop()
-    startDate: Date;
-
-    @Prop()
-    endDate: Date;
-
     @Prop({ required: true })
     value: number; // Phần trăm
 

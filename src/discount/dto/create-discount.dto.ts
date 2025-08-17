@@ -15,14 +15,6 @@ export class CreateDiscountDto {
     @Min(0)
     value: number;
 
-    @IsOptional()
-    @IsDateString()
-    startDate: Date;
-
-    @IsOptional()
-    @IsDateString()
-    endDate: Date;
-
     @IsNotEmpty()
     @IsString()
     createdBy: string;

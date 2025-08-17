@@ -55,21 +55,6 @@ export class DiscountService {
     }
   }
 
-  async getAvailableDiscounts(sellerId: string) {
-    try {
-      const discounts = await this.discountModel.find({
-        sellerId: new Types.ObjectId(sellerId),
-        startDate: { $lte: new Date() },
-        endDate: { $gte: new Date() },
-      }).lean();
-      if (!discounts || discounts.length === 0) {
-        throw new Error('Không có mã giảm giá khả dụng');
-      }
-      return discounts;
-    } catch (error) {
-      throw new Error(`Không thể lấy mã giảm giá khả dụng: ${error.message}`);
-    }
-  }
 
   async calculateFinalPrice(price: number, discountId?: string) {
     if (!discountId) return price;

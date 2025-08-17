@@ -27,11 +27,6 @@ export class DiscountController {
     return await this.discountService.update(id, updateDiscountDto);
   }
 
-  @Get('available/:sellerId')
-  async getAvailableDiscounts(@Param('sellerId') sellerId: string) {
-    return await this.discountService.getAvailableDiscounts(sellerId);
-  }
-
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return await this.discountService.remove(id);
