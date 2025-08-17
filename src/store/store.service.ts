@@ -50,6 +50,10 @@ export class StoreService {
     return this.storeModel.findById(id).populate('userId', 'name email').lean();
   }
 
+  async findByUserId(userId: string) {
+    return this.storeModel.findOne({ userId }).populate('userId', 'name email').lean();
+  }
+
   async update(id: string, updateStoreDto: UpdateStoreDto) {
     return this.storeModel.findByIdAndUpdate(id, updateStoreDto, { new: true }).populate('userId', 'name email').lean();
   }

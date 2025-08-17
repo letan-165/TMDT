@@ -24,8 +24,6 @@ export class CategoriesService {
 
   async findAll(query: string, current: number, pageSize: number) {
     const { filter, sort } = aqp(query);
-    console.log('Filter:', filter);
-    console.log('Sort:', sort);
     if (filter.current) delete filter.current;
     if (filter.pageSize) delete filter.pageSize;
     if (!current) current = 1;

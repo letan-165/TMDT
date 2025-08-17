@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Query } from '@nestjs/common';
 import { CartsService } from './carts.service';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
@@ -21,11 +21,11 @@ export class CartsController {
   }
 
 
-  @Get()
-  @Public()
-  async findAll() {
-    return await this.cartsService.findAll();
-  }
+  // @Get()
+  // @Public()
+  // async findAll(@Query() query: string, @Query('current') current: number, @Query('pageSize') pageSize: number) {
+  //   return await this.cartsService.findAll(query, current, pageSize);
+  // }
 
   @Get(':id')
   @Public()

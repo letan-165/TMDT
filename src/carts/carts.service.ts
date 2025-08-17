@@ -4,6 +4,8 @@ import { UpdateCartDto } from './dto/update-cart.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cart, CartDocument } from './schemas/cart.schema';
 import { Model, Types } from 'mongoose';
+import aqp from 'api-query-params';
+import { StoreService } from '@/store/store.service';
 
 @Injectable()
 export class CartsService {
@@ -35,13 +37,24 @@ export class CartsService {
     }
   }
 
-  async findAll() {
-    try {
-      return await this.cartModel.find().populate('items.productId');
-    } catch (error) {
-      throw new Error('Error finding all carts');
-    }
-  }
+  // async findAll(query: string, current: number, pageSize: number) {
+  //   const { filter, sort } = aqp(query);
+  //   if (filter.current) delete filter.current;
+  //   if (filter.pageSize) delete filter.pageSize;
+  //   if (!current) current = 1;
+  //   if (!pageSize) pageSize = 10;
+  //   const totalItems = await this.cartModel.countDocuments(filter);
+  //   const totalPages = Math.ceil(totalItems / pageSize);
+  //   const skip = (current - 1) * pageSize;
+  //   const carts = await this.cartModel.find(filter).sort(sort as any).skip(skip).limit(pageSize).populate('items.productId').lean();
+  //   for (const cart of carts) {
+  //     cart.items = cart.items.map(item => ({
+  //       ...item,
+  //       product: this.storeService.findByUserId(item.productId)
+  //     }));
+  //   }
+  //   return { carts, totalPages };
+  // }
 
   async findOne(id: string) {
     try {
