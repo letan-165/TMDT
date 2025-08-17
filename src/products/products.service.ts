@@ -6,23 +6,29 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Product, ProductDocument } from './schemas/product.schema';
 import aqp from 'api-query-params';
 import { DiscountService } from '@/discount/discount.service';
+import { StoreService } from '@/store/store.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
     private discountService: DiscountService,
+    private storeService: StoreService
   ) { }
 
   async create(createProductDto: CreateProductDto) {
     try {
+      const store = await this.storeService.findByUserId(createProductDto.sellerId);
+      if (!store) {
+        throw new Error('Cửa hàng không tồn tại');
+      }
       const newProduct = new this.productModel(createProductDto);
+      newProduct.storeId = store._id;
       const finalPrice = await this.discountService.calculateFinalPrice(newProduct.price, createProductDto.discountId);
       if (finalPrice < newProduct.price) {
         newProduct.finalPrice = finalPrice;
         newProduct.haveDiscount = true;
-      }
-      else {
+      } else {
         newProduct.finalPrice = newProduct.price;
         newProduct.haveDiscount = false;
       }

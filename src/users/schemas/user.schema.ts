@@ -12,22 +12,22 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop()
+  @Prop({default: null})
   password?: string;
 
-  @Prop()
+  @Prop({default: null})
   googleId: string;
 
-  @Prop()
+  @Prop({default: null})
   name: string;
 
-  @Prop()
+  @Prop({default: null})
   avatar?: string;
 
-  @Prop()
+  @Prop({default: null})
   address?: string;
 
-  @Prop()
+  @Prop({default: null})
   phone?: string;
 
   @Prop({ default: 'USER' })
@@ -36,13 +36,13 @@ export class User {
   @Prop({ required: true, enum: ['LOCAL', 'GOOGLE'] })
   provider: string;
 
-  @Prop()
+  @Prop({default: null})
   codeReset: string;
 
   @Prop({ type: Date, default: null })
   codeResetExpires: Date;
 
-  @Prop()
+  @Prop({default: null})
   passwordResetToken?: string;
 
   @Prop({ type: Date, default: null })

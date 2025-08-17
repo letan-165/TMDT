@@ -6,7 +6,7 @@ export type DiscountDocument = HydratedDocument<Discount>;
 
 @Schema({ timestamps: true })
 export class Discount {
-    @Prop()
+    @Prop({default: null})
     name: string;
     @Prop({ required: true, unique: true })
     code: string; 
