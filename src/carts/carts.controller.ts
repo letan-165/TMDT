@@ -33,6 +33,12 @@ export class CartsController {
     return await this.cartsService.findOne(id);
   }
 
+  @Patch(':id')
+  @Public()
+  async updateCart(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
+    return await this.cartsService.update(id, updateCartDto);
+  }
+
   @Delete(':id')
   @Public()
   async removeProductFromCart(@Param('id') cartId: string, @Body('productId') productId: string) {

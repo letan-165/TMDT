@@ -255,14 +255,18 @@ export class UsersService implements OnModuleInit{
 
 
   async findOne(id: string) {
-    if (!id) {
-      throw new Error('User ID is required');
+    try {
+      if (!id) {
+        throw new Error('User ID is required');
+      }
+      const user = await this.userModel.findById(id).select('-password').lean();
+      if (!user) {
+        throw new Error('User not found');
+      }
+      return user;
+    } catch (error) {
+      throw new Error('Error finding user');
     }
-    const user = await this.userModel.findById(id).lean();
-    if (!user) {
-      throw new Error('User not found');
-    }
-    return 
   }
 
   async remove(id: string) {

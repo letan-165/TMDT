@@ -46,7 +46,7 @@ export class CartsService {
     const totalItems = await this.cartModel.countDocuments(filter);
     const totalPages = Math.ceil(totalItems / pageSize);
     const skip = (current - 1) * pageSize;
-    const carts = await this.cartModel.find(filter).sort(sort as any).skip(skip).limit(pageSize).populate({path: 'items.productId', populate: {path: 'storeId'}}).lean();
+    const carts = await this.cartModel.find(filter).sort(sort as any).skip(skip).limit(pageSize).populate({path: 'items.productId', select:'name price', populate: {path: 'storeId', select: 'name address'}}).lean();
     return { carts, totalPages };
   }
 
@@ -67,7 +67,7 @@ export class CartsService {
       if (!Types.ObjectId.isValid(userId)) {
         throw new Error('Invalid user ID');
       }
-      const cart = await this.cartModel.findOne({ userId }).populate('items.productId', 'name price');
+      const cart = await this.cartModel.findOne({ userId }).populate({ path: 'items.productId', select: 'name price finalPrice quantity', populate: { path: 'storeId', select: 'name address' } }).lean();
       if (!cart) {
         throw new Error(`Cart for user with ID ${userId} not found`);
       }
@@ -98,6 +98,18 @@ export class CartsService {
       return await cart.save();
     } catch (error) {
       throw new Error('Error deleting product from cart');
+    }
+  }
+
+  async remove(id: string) {
+    try {
+      const deletedCart = await this.cartModel.findByIdAndDelete(id);
+      if (!deletedCart) {
+        throw new Error(`Cart with ID ${id} not found`);
+      }
+      return deletedCart;
+    } catch (error) {
+      throw new Error('Error deleting cart');
     }
   }
 
