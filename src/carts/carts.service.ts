@@ -32,6 +32,7 @@ export class CartsService {
       }
       const newCart = new this.cartModel(createCartDto);
       return newCart.save();
+      
     } catch (error) {
       throw new Error('Error creating cart');
     }
@@ -67,7 +68,7 @@ export class CartsService {
       if (!Types.ObjectId.isValid(userId)) {
         throw new Error('Invalid user ID');
       }
-      const cart = await this.cartModel.findOne({ userId }).populate({ path: 'items.productId', select: 'name price finalPrice quantity', populate: { path: 'storeId', select: 'name address' } }).lean();
+      const cart = await this.cartModel.findOne({ userId }).populate({ path: 'items.productId', select: 'name price finalPrice quantity images', populate: { path: 'storeId', select: 'name address' } }).lean();
       if (!cart) {
         throw new Error(`Cart for user with ID ${userId} not found`);
       }
@@ -95,7 +96,7 @@ export class CartsService {
         throw new Error(`Cart with ID ${cartId} not found`);
       }
       cart.items = cart.items.filter(item => item.productId.toString() !== productId.toString());
-      return await cart.save();
+      return { message: 'Product removed from cart successfully' };
     } catch (error) {
       throw new Error('Error deleting product from cart');
     }
@@ -107,7 +108,7 @@ export class CartsService {
       if (!deletedCart) {
         throw new Error(`Cart with ID ${id} not found`);
       }
-      return deletedCart;
+      return { message: 'Cart deleted successfully' };
     } catch (error) {
       throw new Error('Error deleting cart');
     }

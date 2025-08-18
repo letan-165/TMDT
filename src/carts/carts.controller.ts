@@ -44,4 +44,10 @@ export class CartsController {
   async removeProductFromCart(@Param('id') cartId: string, @Body('productId') productId: string) {
     return await this.cartsService.removeProductFromCart(cartId, productId);
   }
+
+  @Delete('all/:id')
+  @Public()
+  async removeCartByUserId(@Param('id') id: string) {
+    return await this.cartsService.remove(id);
+  }
 }

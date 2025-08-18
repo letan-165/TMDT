@@ -20,11 +20,11 @@ import { OrdersModule } from '@/orders/orders.module';
         testMode: true, 
       }),
       inject: [ConfigService],
-    }),
-    OrdersModule,
+    })
 
   ],
   controllers: [PaymentController],
   providers: [PaymentService],
+  exports: [PaymentService]
 })
 export class PaymentModule { }

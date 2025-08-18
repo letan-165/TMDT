@@ -28,7 +28,4 @@ export class CreateOrderDto {
     @IsArray()
     items: Array<OrderItem>;
 
-    @IsOptional()
-    @IsString()
-    discountCode?: string;
 }

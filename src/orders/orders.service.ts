@@ -6,14 +6,15 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { OrderStatus } from './enum/status.enum';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { SendMailService } from '@/send-mail/send-mail.service';
-import { DiscountService } from '@/discount/discount.service';
 import aqp from 'api-query-params';
+import { PaymentService } from '@/payment/payment.service';
+
 
 @Injectable()
 export class OrdersService {
   constructor(
     private productService: ProductsService,
+    private paymentService: PaymentService,
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
   ) { }
 
@@ -27,7 +28,7 @@ export class OrdersService {
           throw new Error(`Product with ID ${item.productId} not found`);
         }
         if (product.stock < item.quantity) {
-          throw new Error(`Insufficient stock for product ${product.name}`);
+          throw new Error(`Sản phẩm ${product.name} không đủ số lượng`);
         }
       }
 
@@ -39,20 +40,22 @@ export class OrdersService {
         items,
         totalAmount,
         status: OrderStatus.PENDING,
-        
       };
   
       const order = new this.orderModel(orderData);
       const savedOrder = await order.save();
 
+      // Tích hợp thanh toán qua VNPAY sau khi tạo đơn hàng
       await savedOrder.populate('userId', 'name');
       await savedOrder.populate('sellerId', 'name');
       await savedOrder.populate('items.productId', 'name price');
 
-      return savedOrder;
+      // Gọi service xử lý thanh toán VNPAY (giả sử bạn có VnpayService)
+      // Truyền thông tin đơn hàng và nhận về url thanh toán hoặc kết quả
+      const paymentUrl = await this.paymentService.createPaymentUrl({ orderId: savedOrder._id.toString(), amount: totalAmount });
+      return { order: savedOrder, paymentUrl };
     } catch (error) {
       console.error('Error creating order:', error);
-      throw new Error(`Failed to create order: ${error.message}`);
     }
   }
 
@@ -66,7 +69,6 @@ export class OrdersService {
         .populate('userId', 'name email')
         .populate('sellerId', 'name email')
         .populate('items.productId', 'name price')
-        .populate('discountId', 'code name value');
 
       if (!order) {
         throw new Error(`Order with ID ${id} not found`);
@@ -114,6 +116,15 @@ export class OrdersService {
       return { message: 'Order deleted successfully' };
     } catch (error) {
       throw new Error(`Failed to delete order: ${error.message}`);
+    }
+  }
+
+  async findOrdersByUserId(userId: string) {
+    try {
+      const orders = await this.orderModel.find({ userId }).populate('items.productId', 'name');
+      return orders;
+    } catch (error) {
+      throw new Error(`Failed to get orders for user ${userId}: ${error.message}`);
     }
   }
 }

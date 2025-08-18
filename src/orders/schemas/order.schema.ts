@@ -29,9 +29,6 @@ export class Order {
     @Prop({ required: true })
     totalAmount: number;
 
-    @Prop({ type: Types.ObjectId, ref: 'Discount', required: false })
-    discountId?: Discount;
-
     @Prop({ default: OrderStatus.PENDING, enum: OrderStatus })
     status: OrderStatus;
 }
