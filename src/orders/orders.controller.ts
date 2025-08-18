@@ -26,6 +26,12 @@ export class OrdersController {
     return this.ordersService.updateStatus(id, updateOrderDto);
   }
 
+  @Get('user/:userId')
+  @Public()
+  findOrdersByUserId(@Param('userId') userId: string) {
+    return this.ordersService.findOrdersByUserId(userId);
+  }
+
   @Delete(':id')
   @Public()
   remove(@Param('id') id: string) {
