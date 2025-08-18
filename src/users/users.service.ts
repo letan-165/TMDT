@@ -249,9 +249,10 @@ export class UsersService implements OnModuleInit{
     const totalItems = await this.userModel.countDocuments(filter);
     const totalPages = Math.ceil(totalItems / pageSize); 
     const skip = (current - 1) * pageSize;
-    const users = await this.userModel.find(filter).sort(sort as any).skip(skip).limit(pageSize).lean();
+    const users = await this.userModel.find(filter).sort(sort as any).skip(skip).limit(pageSize).select('-password').lean();
     return { users, totalPages };
   }
+
 
   async findOne(id: string) {
     if (!id) {
@@ -261,7 +262,7 @@ export class UsersService implements OnModuleInit{
     if (!user) {
       throw new Error('User not found');
     }
-    return user;
+    return 
   }
 
   async remove(id: string) {

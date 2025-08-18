@@ -11,7 +11,6 @@ import { StoreService } from '@/store/store.service';
 export class CartsService {
   constructor(
     @InjectModel(Cart.name) private cartModel: Model<CartDocument>,
-    //private storeService: StoreService
   ) { }
   async create(createCartDto: CreateCartDto) {
     const { userId, items } = createCartDto;
@@ -47,12 +46,7 @@ export class CartsService {
     const totalItems = await this.cartModel.countDocuments(filter);
     const totalPages = Math.ceil(totalItems / pageSize);
     const skip = (current - 1) * pageSize;
-    const carts = await this.cartModel.find(filter).sort(sort as any).skip(skip).limit(pageSize).populate('items.productId').lean();
-    for (const cart of carts) {
-      await cart.populate('items.productId', 'name price');
-      //const store = await this.storeService.findByUserId(cart.userId.toString());
-      
-    }
+    const carts = await this.cartModel.find(filter).sort(sort as any).skip(skip).limit(pageSize).populate({path: 'items.productId', populate: {path: 'storeId'}}).lean();
     return { carts, totalPages };
   }
 

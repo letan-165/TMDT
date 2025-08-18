@@ -33,8 +33,6 @@ export class ProductsService {
         newProduct.haveDiscount = false;
       }
       await newProduct.save();
-      await newProduct.populate('categoryId', 'name tags');
-      await newProduct.populate('discountId', 'code value');
       return newProduct;
     } catch (error) {
       throw new Error(`Không thể tạo sản phẩm: ${error.message}`);
@@ -60,7 +58,7 @@ export class ProductsService {
       .sort(sort as any)
       .skip(skip)
       .limit(pageSize)
-      .populate('categoryId', 'name tags').populate('discountId', 'name code value').lean();
+      .populate('discountId', 'name code value').populate('storeId', 'name address').lean();
     return { products, totalPages };
   }
 
@@ -69,7 +67,7 @@ export class ProductsService {
       if (!Types.ObjectId.isValid(id)) {
         throw new Error('ID sản phẩm không hợp lệ');
       }
-      const product = await this.productModel.findById(id).populate('categoryId', 'name tags').populate('discountId', 'name code value');
+      const product = await this.productModel.findById(id).populate('categoryId', 'name tags').populate('discountId', 'name code value').populate('storeId', 'name address').populate('sellerId', 'name email');
       if (!product) {
         throw new Error('Không tìm thấy sản phẩm');
       }
@@ -112,8 +110,6 @@ export class ProductsService {
         updatedProduct.haveDiscount = false;
       }
       await updatedProduct.save();
-      await updatedProduct.populate('categoryId', 'name tags');
-      await updatedProduct.populate('discountId', 'name code value');
       return updatedProduct;
     }
     catch (error) {

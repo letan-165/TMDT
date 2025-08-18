@@ -18,7 +18,7 @@ export class OrdersService {
   ) { }
 
   async create(createOrderDto: CreateOrderDto) {
-    const { userId, sellerId, items, discountCode } = createOrderDto;
+    const { userId, sellerId, items } = createOrderDto;
     try {
       // Kiểm tra stock sản phẩm
       for (const item of items) {

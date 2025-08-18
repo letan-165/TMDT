@@ -20,4 +20,16 @@ export class OrdersController {
     return this.ordersService.findOne(id);
   }
 
+  @Patch(':id')
+  @Public()
+  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
+    return this.ordersService.updateStatus(id, updateOrderDto);
+  }
+
+  @Delete(':id')
+  @Public()
+  remove(@Param('id') id: string) {
+    return this.ordersService.remove(id);
+  }
+
 }

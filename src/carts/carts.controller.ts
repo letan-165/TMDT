@@ -14,18 +14,18 @@ export class CartsController {
     return await this.cartsService.create(createCartDto);
   }
 
-  @Get('carts/me')
+
+  @Get()
   @Public()
-  async findCartByUserId(@Req() req) {
-    return await this.cartsService.findCartByUserId(req.user.userId);
+  async findAll(@Query() query: string, @Query('current') current: number, @Query('pageSize') pageSize: number) {
+    return await this.cartsService.findAll(query, current, pageSize);
   }
 
-
-  // @Get()
-  // @Public()
-  // async findAll(@Query() query: string, @Query('current') current: number, @Query('pageSize') pageSize: number) {
-  //   return await this.cartsService.findAll(query, current, pageSize);
-  // }
+  @Get('/me/:id')
+  @Public()
+  async findCartByUserId(@Param('id') userId: string) {
+    return await this.cartsService.findCartByUserId(userId);
+  }
 
   @Get(':id')
   @Public()
