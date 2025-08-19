@@ -20,6 +20,12 @@ export class ProductsController {
     return this.productsService.findAll(query, current, pageSize);
   }
 
+  @Get('store/:storeId')
+  @Public()
+  findProductsByStore(@Param('storeId') storeId: string) {
+    return this.productsService.findProductsByStore(storeId);
+  }
+
   @Get(':id')
   @Public()
   findOne(@Param('id') id: string) {

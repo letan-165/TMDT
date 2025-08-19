@@ -117,6 +117,18 @@ export class ProductsService {
     }
   }
 
+  async findProductsByStore(storeId: string) {
+    try {
+      const products = await this.productModel.find({ storeId }).populate('categoryId', 'name tags').populate('discountId', 'name code value').lean();
+      if (!products) {
+        throw new NotFoundException('Không có sản phẩm nào của cửa hàng này');
+      }
+      return products;
+    } catch (error) {
+      throw new Error(`Không thể tìm sản phẩm: ${error.message}`);
+    }
+  }
+
   async removeDiscountFromProduct(id: string) {
     try {
       if (!Types.ObjectId.isValid(id)) {

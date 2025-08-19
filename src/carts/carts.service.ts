@@ -79,10 +79,23 @@ export class CartsService {
   }
   async update(id: string, updateCartDto: UpdateCartDto) {
     try {
-      const updatedCart = await this.cartModel.findByIdAndUpdate(id, updateCartDto, { new: true });
+      const updatedCart = await this.cartModel.findById(id);
       if (!updatedCart) {
         throw new Error(`Cart with ID ${id} not found`);
       }
+
+      for (const item of updateCartDto.items) {
+        const existingItemIndex = updatedCart.items.findIndex(cartItem => cartItem.productId.toString() === item.productId.toString());
+        if (existingItemIndex !== -1) {
+          updatedCart.items[existingItemIndex].quantity = item.quantity;
+        } else {
+          updatedCart.items.push({
+            productId: new Types.ObjectId(item.productId),
+            quantity: item.quantity
+          });
+        }
+      }
+      await updatedCart.save();
       return updatedCart;
     } catch (error) {
       throw new Error('Error updating cart');

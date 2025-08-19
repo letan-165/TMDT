@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { StoreService } from './store.service';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
+import { Public } from '@/auth/decorator/public';
 
 @Controller('store')
 export class StoreController {
@@ -20,6 +21,12 @@ export class StoreController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.storeService.findOne(id);
+  }
+
+  @Post('user')
+  @Public()
+  findByUser(@Body('userId') userId: string) {
+    return this.storeService.findByUserId(userId);
   }
 
   @Patch(':id')

@@ -8,6 +8,7 @@ export type DiscountDocument = HydratedDocument<Discount>;
 export class Discount {
     @Prop({default: null})
     name: string;
+    
     @Prop({ required: true, unique: true })
     code: string; 
 
