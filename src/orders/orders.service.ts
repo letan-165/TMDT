@@ -127,4 +127,13 @@ export class OrdersService {
       throw new Error(`Failed to get orders for user ${userId}: ${error.message}`);
     }
   }
+
+  async findOrdersBySellerId(sellerId: string) {
+    try {
+      const orders = await this.orderModel.find({ sellerId }).populate('items.productId', 'name');
+      return orders;
+    } catch (error) {
+      throw new Error(`Failed to get orders for seller ${sellerId}: ${error.message}`);
+    }
+  }
 }

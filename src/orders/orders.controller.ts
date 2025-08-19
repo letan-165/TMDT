@@ -38,4 +38,10 @@ export class OrdersController {
     return this.ordersService.remove(id);
   }
 
+  @Get('seller/:sellerId')
+  @Public()
+  findOrdersBySellerId(@Param('sellerId') sellerId: string) {
+    return this.ordersService.findOrdersBySellerId(sellerId);
+  }
+
 }
