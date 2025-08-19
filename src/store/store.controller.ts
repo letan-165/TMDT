@@ -14,19 +14,21 @@ export class StoreController {
   }
 
   @Get()
+  @Public()
   findAll(@Query() query: string, @Query('current') current: number, @Query('pageSize') pageSize: number) {
     return this.storeService.findAll(query, current, pageSize);
   }
 
   @Get(':id')
+  @Public()
   findOne(@Param('id') id: string) {
     return this.storeService.findOne(id);
   }
 
-  @Post('user')
+  @Get('user/:userId')
   @Public()
-  findByUser(@Body('userId') userId: string) {
-    return this.storeService.findByUserId(userId);
+  async findByUser(@Param('userId') userId: string) {
+    return await this.storeService.findByUserId(userId);
   }
 
   @Patch(':id')

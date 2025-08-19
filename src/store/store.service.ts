@@ -51,7 +51,11 @@ export class StoreService {
   }
 
   async findByUserId(userId: string) {
-    return this.storeModel.findOne({ userId }).populate('userId', 'name email').lean();
+    const store = await this.storeModel.findOne({ userId }).populate('userId', 'name email').lean();
+    if (!store) {
+      throw new Error(`Store not found for user ID ${userId}`);
+    }
+    return store;
   }
 
   async update(id: string, updateStoreDto: UpdateStoreDto) {
