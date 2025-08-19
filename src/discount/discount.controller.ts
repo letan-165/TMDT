@@ -22,6 +22,12 @@ export class DiscountController {
     return await this.discountService.findOne(id);
   }
 
+  @Get('seller/:sellerId')
+  async findBySeller(@Param('sellerId') sellerId: string) {
+    return await this.discountService.findOneBySeller(sellerId);
+  }
+
+
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateDiscountDto: UpdateDiscountDto) {
     return await this.discountService.update(id, updateDiscountDto);
