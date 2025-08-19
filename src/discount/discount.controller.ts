@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { DiscountService } from './discount.service';
 import { CreateDiscountDto } from './dto/create-discount.dto';
 import { UpdateDiscountDto } from './dto/update-discount.dto';
+import { Public } from '@/auth/decorator/public';
 
 @Controller('discount')
 export class DiscountController {
@@ -23,6 +24,7 @@ export class DiscountController {
   }
 
   @Get('seller/:sellerId')
+  @Public()
   async findBySeller(@Param('sellerId') sellerId: string) {
     return await this.discountService.findOneBySeller(sellerId);
   }

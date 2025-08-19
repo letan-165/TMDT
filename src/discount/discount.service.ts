@@ -65,11 +65,11 @@ export class DiscountService {
     return price - (price * discount.value) / 100;
   }
 
-  async findOneBySeller(id: string) {
+  async findOneBySeller(sellerId: string) {
     try {
-      const discounts = await this.discountModel.find({ sellerId: id}).lean()
+      const discounts = await this.discountModel.findOne({ createdBy: sellerId }).lean()
       if (!discounts) {
-        throw new Error(`Không tìm thấy mã giảm giá cho người bán với ID ${id}`);
+        throw new Error(`Không tìm thấy mã giảm giá cho người bán với ID ${sellerId}`);
       }
       return discounts;
     } catch (error) {
