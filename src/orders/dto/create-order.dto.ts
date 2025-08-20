@@ -9,21 +9,12 @@ export class OrderItem {
     @IsNumber()
     @Min(1)
     quantity: number;
-
-    @IsNotEmpty()
-    @IsNumber()
-    @Min(0)
-    price: number;
 }
 
 export class CreateOrderDto {
     @IsNotEmpty()
     @IsString()
     userId: string;
-
-    @IsNotEmpty()
-    @IsString()
-    sellerId: string;
 
     @IsArray()
     items: Array<OrderItem>;

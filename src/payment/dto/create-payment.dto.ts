@@ -1,9 +1,25 @@
-import { IsNotEmpty } from "class-validator";
+import { IsArray, IsNotEmpty, IsString, IsNumber, IsOptional, Min } from "class-validator";
 
 export class CreatePaymentDto {
     @IsNotEmpty()
-    orderId: string;
+    @IsArray()
+    @IsString({ each: true })
+    orderIds: string[]; // Mảng các order IDs
 
     @IsNotEmpty()
-    amount: number;
+    @IsNumber()
+    @Min(1000) // Tối thiểu 1000 VND
+    amount: number; // Tổng số tiền (VND)
+
+    @IsOptional()
+    @IsString()
+    ipAddr?: string; // IP address của user
+
+    @IsOptional()
+    @IsString()
+    description?: string; // Mô tả thanh toán
+
+    @IsOptional()
+    @IsString()
+    returnUrl?: string; // URL return tùy chỉnh
 }

@@ -8,7 +8,13 @@ import { VnpayCallbackDto } from './dto/callback-vnpay.dto';
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) { }
 
-  @Post('vnpay')
+  @Post('create')
+  @Public()
+  async createPayment(@Body() createPaymentDto: CreatePaymentDto) {
+    return await this.paymentService.createPaymentUrl(createPaymentDto);
+  }
+
+  @Post('vnpay') // Legacy endpoint
   @Public()
   async create(@Body() createPaymentDto: CreatePaymentDto) {
     return await this.paymentService.createPaymentUrl(createPaymentDto);
@@ -16,13 +22,39 @@ export class PaymentController {
 
   @Get('callback')
   @Public()
-  async callback(@Body() CallbackVnpayDto: VnpayCallbackDto) {
-    return await this.paymentService.handleVnpayCallback(CallbackVnpayDto);
+  async vnpayCallback(@Query() callbackQuery: VnpayCallbackDto) {
+    return await this.paymentService.handleVnpayCallback(callbackQuery);
   }
 
-  @Get('back-list')
+  @Post('callback') // Support both GET and POST callback
+  @Public()
+  async vnpayCallbackPost(@Body() callbackDto: VnpayCallbackDto) {
+    return await this.paymentService.handleVnpayCallback(callbackDto);
+  }
+
+  @Get('list')
+  async getPaymentList() {
+    return await this.paymentService.getPaymentList();
+  }
+
+  @Get(':id')
+  async getPaymentById(@Param('id') id: string) {
+    return await this.paymentService.getPaymentById(id);
+  }
+
+  @Get('orders/:orderIds')
+  async getPaymentsByOrderIds(@Param('orderIds') orderIds: string) {
+    const orderIdArray = orderIds.split(',');
+    return await this.paymentService.getPaymentsByOrderIds(orderIdArray);
+  }
+
+  @Patch(':id/cancel')
+  async cancelPayment(@Param('id') id: string) {
+    return await this.paymentService.cancelPayment(id);
+  }
+
+  @Get('back-list') // Legacy endpoint
   async getBackList() {
     return await this.paymentService.getBackList();
   }
-
 }

@@ -13,7 +13,7 @@ export class Product {
   categoryId: Category;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'User'})
-  sellerId: User;
+  sellerId: Types.ObjectId;
 
   @Prop({ required: true })
   name: string;
