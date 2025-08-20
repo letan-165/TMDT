@@ -26,7 +26,7 @@ export class DiscountController {
   @Get('seller/:sellerId')
   @Public()
   async findBySeller(@Param('sellerId') sellerId: string) {
-    return await this.discountService.findOneBySeller(sellerId);
+    return await this.discountService.findBySeller(sellerId);
   }
 
 

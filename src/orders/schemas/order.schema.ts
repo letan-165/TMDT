@@ -24,6 +24,7 @@ export class Order {
         productId: Product;
         quantity: number;
         price: number;
+        
     }>;
 
     @Prop({ required: true })
