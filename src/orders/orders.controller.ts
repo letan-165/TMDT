@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -20,10 +20,17 @@ export class OrdersController {
     return this.ordersService.findOne(id);
   }
 
+  @Get()
+  @Public()
+  findAll(@Query() query: any, @Query('current') current: number, @Query('pageSize') pageSize: number) {
+    return this.ordersService.findAll(query, current, pageSize);
+  }
+
   @Patch(':id')
   @Public()
   update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.ordersService.updateStatus(id, updateOrderDto);
+    
   }
 
   @Get('user/:userId')

@@ -37,7 +37,7 @@ export class OrdersService {
         if (!itemsBySeller.has(sellerId)) {
           itemsBySeller.set(sellerId, []);
         }
-        itemsBySeller.get(sellerId)!.push({productId: item.productId, quantity: item.quantity, price: product.finalPrice});
+        itemsBySeller.get(sellerId)!.push({productId: product._id, quantity: item.quantity, price: product.finalPrice});
       }
       // Tạo order riêng cho mỗi seller
       const orders: OrderDocument[] = [];
@@ -56,8 +56,8 @@ export class OrdersService {
       // Truyền thông tin đơn hàng và nhận về url thanh toán hoặc kết quả
       // Lưu tất cả orders
       const savedOrders = await this.orderModel.insertMany(orders);
-      
-      // Tính tổng amount của tất cả orders
+
+      // Tính tổng amount của tất cả
       const totalPaymentAmount = savedOrders.reduce((sum, order) => sum + order.totalAmount, 0);
       
       // Tạo 1 payment URL duy nhất cho tất cả orders
@@ -74,13 +74,13 @@ export class OrdersService {
   }
 
 
-
-
-      
-
-
 updateStatus(id: string, updateOrderDto: UpdateOrderDto) {
-  return this.orderModel.findByIdAndUpdate(id, updateOrderDto, { new: true });
+  try {
+    console.log('Updating order status:', id, updateOrderDto);
+    return this.orderModel.findByIdAndUpdate(id, updateOrderDto, { new: true }).populate('userId', 'name email').populate('sellerId', 'name email').populate('items.productId', 'name price');
+  } catch (error) {
+    console.error('Error updating order status:', error);
+  }
 }
 
   async findOne(id: string) {
@@ -121,7 +121,6 @@ updateStatus(id: string, updateOrderDto: UpdateOrderDto) {
     .populate('userId', 'name email')
     .populate('sellerId', 'name email')
     .populate('items.productId', 'name price')
-    .populate('discountId', 'code name value')
     .lean();
 
   return { orders, totalPages };
