@@ -6,6 +6,7 @@ import { SignUpForm } from "../../components/molecules/formsAuth/SignUpForm";
 import { UpdatePassForm } from "../../components/molecules/formsAuth/UpdatePassForm";
 import FooterCus from "../../components/organisms/FooterCus";
 import { HeaderLoginCus } from "../../components/organisms/HeaderLoginCus";
+import { OtpForm } from "../../components/molecules/formsAuth/OtpForm";
 
 export function LoginPage() {
   const [page, setPage] = useState("login");
@@ -67,6 +68,7 @@ export function LoginPage() {
           {page === "login" && <LoginForm setPage={setPage} />}
           {page === "signup" && <SignUpForm setPage={setPage} />}
           {page === "forgot" && <ForgotPassForm setPage={setPage} />}
+          {page === "otp" && <OtpForm setPage={setPage} />}
           {page === "update" && <UpdatePassForm setPage={setPage} />}
         </Stack>
       </Stack>

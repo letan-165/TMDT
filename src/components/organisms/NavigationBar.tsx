@@ -19,9 +19,7 @@ const NavigationBar = ({
     const fetchData = async () => {
       try {
         setStore(await StoreService.findByUserId(userID));
-      } catch (e) {
-        throw e;
-      }
+      } catch (e) {}
     };
 
     fetchData();

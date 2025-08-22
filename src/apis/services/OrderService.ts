@@ -11,6 +11,9 @@ const OrderService = {
   getBySeller: async (sellerId): Promise<Order[]> => {
     return await axiosClient.get(`${API_Order}/seller/${sellerId}`);
   },
+  getByCustomer: async (userId): Promise<Order[]> => {
+    return await axiosClient.get(`${API_Order}/user/${userId}`);
+  },
 
   updateStatus: async (orderID, status): Promise<Order> => {
     return await axiosClient.patch(`${API_Order}/${orderID}`, {

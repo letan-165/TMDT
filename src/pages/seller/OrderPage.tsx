@@ -11,7 +11,15 @@ import NavigationBar from "../../components/organisms/NavigationBar";
 const OrderPage = () => {
   const [page, setPage] = useState(0);
   const [orders, setOrders] = useState<Order[]>();
+  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const userID = localStorage.getItem("userID");
+  const listState = [
+    "",
+    "PENDING",
+    "CONFIRMED",
+    "SHIPPING",
+    "COMPLETED",
+  ] as const;
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -23,6 +31,17 @@ const OrderPage = () => {
 
     fetchData();
   }, []);
+  useEffect(() => {
+    const state = listState[page];
+    if (!orders) return;
+
+    if (state) {
+      setFilteredOrders(orders.filter((o) => o.status === state));
+    } else {
+      setFilteredOrders(orders);
+    }
+  }, [orders, page]);
+
   return (
     <Box sx={{ fontFamily: "sans-serif", bgcolor: "#fff" }}>
       <HeaderCustomerCus />
@@ -36,7 +55,7 @@ const OrderPage = () => {
             setPage={setPage}
             nav={["Tất cả", "Cần duyệt", "Đã duyệt", "Đang giao", "Hoàn thành"]}
           />
-          <BodyOrder orders={orders} />
+          <BodyOrder orders={filteredOrders} />
         </Stack>
       </Stack>
       <FooterCus />

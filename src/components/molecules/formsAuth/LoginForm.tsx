@@ -29,6 +29,7 @@ export function LoginForm({ setPage }: { setPage: (page) => void }) {
     if (await AuthService.login(formData)) {
       window.location.href = Paths.HOME;
     } else {
+      setLoading(false);
       alert("Sai tài khoản hoặc mật khẩu");
     }
   };

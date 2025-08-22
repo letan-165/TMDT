@@ -21,10 +21,12 @@ const CardOrder = ({
   i,
   order,
   gridTemplateColumns,
+  isAdmin,
 }: {
   i: number;
   order: Order;
   gridTemplateColumns: string;
+  isAdmin: boolean;
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -44,29 +46,40 @@ const CardOrder = ({
     }
   };
 
+  const itemUn = {
+    icon: <ArrowBackIcon sx={{ color: "white" }} />,
+    label: "",
+    color: "white",
+    onClick: () => setOpen((prev) => !prev),
+  };
+
   const items = [
-    {
-      icon: <ArrowBackIcon />,
-      label: "Quay lại",
-      color: "black",
-      onClick: (order) => {
-        handleStatus(order, -1);
-      },
-    },
+    isAdmin
+      ? {
+          icon: <ArrowBackIcon />,
+          label: "Quay lại",
+          color: "black",
+          onClick: (order) => {
+            handleStatus(order, -1);
+          },
+        }
+      : itemUn,
     {
       icon: <ShoppingBagIcon />,
       label: "Xem",
       color: "blue",
-      onClick: () => setOpen((prev) => !prev), // toggle open
+      onClick: () => setOpen((prev) => !prev),
     },
-    {
-      icon: <ArrowForwardIcon />,
-      label: "Tiếp tục",
-      color: "red",
-      onClick: (order) => {
-        handleStatus(order, 1);
-      },
-    },
+    isAdmin
+      ? {
+          icon: <ArrowForwardIcon />,
+          label: "Tiếp tục",
+          color: "red",
+          onClick: (order) => {
+            handleStatus(order, 1);
+          },
+        }
+      : itemUn,
   ];
 
   return (
@@ -89,7 +102,7 @@ const CardOrder = ({
         <Col text={order._id} bold={undefined} />
         <Col text={formatVND(order.totalAmount)} bold />
         <Col text={order.userId} bold={undefined} />
-        <Col text={"Chưa thanh toán"} bold={undefined} />
+        <Col text={"Đã thanh toán"} bold={undefined} />
         <Col text={formatTime(order.createdAt)} bold={undefined} />
         <Chip
           label={order.status}
@@ -100,9 +113,11 @@ const CardOrder = ({
         <Stack direction="row" justifyContent="center">
           {items.map((item, i) =>
             (i === 0 && order.status === "PENDING") ||
-            (i === listState.length - 2 &&
-              order.status === "COMPLETED") ? null : (
+            (i === listState.length - 2 && order.status === "COMPLETED") ? (
+              <Stack flex={1} />
+            ) : (
               <Stack
+                flex={1}
                 onClick={() => item.onClick(order)}
                 key={i}
                 alignItems="center"

@@ -3,7 +3,13 @@ import { Order } from "../../../apis/dto/Response";
 import CardOrder from "../../atoms/Card/CardOrder";
 import LoadingCus from "../../atoms/LoadingCus";
 
-export default function BodyOrder({ orders }: { orders?: Order[] }) {
+export default function BodyOrder({
+  orders,
+  isAdmin = true,
+}: {
+  orders?: Order[];
+  isAdmin?: boolean;
+}) {
   const gridTemplateColumns = "1fr 2fr 1fr 3fr 2fr 2fr 2fr";
   return (
     <Container sx={{ py: 1 }}>
@@ -21,9 +27,9 @@ export default function BodyOrder({ orders }: { orders?: Order[] }) {
       >
         {[
           "Mã đơn",
-          "Doanh thu",
+          "Tổng đơn",
           "Người đặt",
-          "Phương thức thanh toán",
+          "Trạng thái thanh toán",
           "Ngày tạo",
           "Trạng thái",
           "Thao tác",
@@ -47,9 +53,11 @@ export default function BodyOrder({ orders }: { orders?: Order[] }) {
         <Stack spacing={1} mt={1}>
           {orders.map((order, i) => (
             <CardOrder
+              key={i}
               order={order}
               i={i}
               gridTemplateColumns={gridTemplateColumns}
+              isAdmin={isAdmin}
             />
           ))}
         </Stack>
