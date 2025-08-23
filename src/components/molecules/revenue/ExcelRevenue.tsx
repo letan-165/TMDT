@@ -1,4 +1,3 @@
-// WeekRangeToolbar.jsx
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
@@ -11,9 +10,22 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import * as XLSX from "xlsx";
 
-function formatDDMMYYYY(date) {
+export type DateRange = {
+  start: string; 
+  end: string; 
+};
+
+type ExcelRevenueProps = {
+  defaultRange?: DateRange;
+  onRangeChange?: (range: DateRange) => void;
+  orders?: any[]; //
+};
+
+// ==== Hàm format ngày để hiển thị ====
+function formatDDMMYYYY(date: string) {
   if (!date) return "";
   const d = new Date(date);
   const dd = String(d.getDate()).padStart(2, "0");
@@ -22,16 +34,52 @@ function formatDDMMYYYY(date) {
   return `${dd}/${mm}/${yyyy}`;
 }
 
-export default function ExcelRevenue() {
-  const [range, setRange] = useState({
-    start: "2025-08-12",
-    end: "2025-08-20",
-  });
+// ==== Lấy mặc định tuần trước -> hôm nay ====
+function getDefaultRange(): DateRange {
+  const today = new Date();
+  const lastWeek = new Date();
+  lastWeek.setDate(today.getDate() - 7);
 
-  const [anchorEl, setAnchorEl] = useState(null);
+  return {
+    start: lastWeek.toISOString().split("T")[0],
+    end: today.toISOString().split("T")[0],
+  };
+}
 
-  const openPopover = (e) => setAnchorEl(e.currentTarget);
+export default function ExcelRevenue({
+  defaultRange,
+  onRangeChange,
+  orders = [],
+}: ExcelRevenueProps) {
+  const [range, setRange] = useState<DateRange>(
+    defaultRange || getDefaultRange()
+  );
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  useEffect(() => {
+    if (onRangeChange) onRangeChange(range);
+  }, [range, onRangeChange]);
+
+  const openPopover = (e: React.MouseEvent<HTMLElement>) =>
+    setAnchorEl(e.currentTarget);
   const closePopover = () => setAnchorEl(null);
+
+  // 👉 Hàm export Excel
+  const handleExportExcel = () => {
+    if (!orders || orders.length === 0) {
+      alert("Không có dữ liệu để xuất Excel!");
+      return;
+    }
+
+    // Chuyển orders thành worksheet
+    const worksheet = XLSX.utils.json_to_sheet(orders);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "DoanhThu");
+
+    // Xuất file
+    const fileName = `DoanhThu_${range.start}_to_${range.end}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+  };
 
   return (
     <Stack sx={{ width: "100%", my: 3, gap: 1 }}>
@@ -88,9 +136,7 @@ export default function ExcelRevenue() {
             height: 36,
             color: "black",
           }}
-          onClick={() => {
-            console.log("Xuất file excel cho:", range);
-          }}
+          onClick={handleExportExcel} // 👉 xuất excel
         >
           Xuất file excel
         </Button>
@@ -101,7 +147,20 @@ export default function ExcelRevenue() {
   );
 }
 
-const PopoverRevenue = ({ anchorEl, closePopover, range, setRange }) => {
+// ==== Popover chọn ngày ====
+type PopoverRevenueProps = {
+  anchorEl: HTMLElement | null;
+  closePopover: () => void;
+  range: DateRange;
+  setRange: React.Dispatch<React.SetStateAction<DateRange>>;
+};
+
+const PopoverRevenue = ({
+  anchorEl,
+  closePopover,
+  range,
+  setRange,
+}: PopoverRevenueProps) => {
   return (
     <Popover
       open={Boolean(anchorEl)}

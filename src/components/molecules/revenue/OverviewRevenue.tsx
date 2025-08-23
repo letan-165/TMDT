@@ -1,6 +1,7 @@
 import { Box, Divider, Paper, Stack, Typography } from "@mui/material";
+import { formatVND } from "../../util/FunctionCus";
 
-const OverviewRevenue = () => {
+const OverviewRevenue = ({ totalRevenue }) => {
   return (
     <Paper
       elevation={0}
@@ -29,7 +30,7 @@ const OverviewRevenue = () => {
               Tổng cộng
             </Typography>
             <Typography variant="h5" sx={{ mt: 1, fontWeight: 800 }}>
-              590,000₫
+              0₫
             </Typography>
           </Paper>
 
@@ -47,14 +48,18 @@ const OverviewRevenue = () => {
                 <Typography sx={{ fontSize: 15, color: "text.secondary" }}>
                   Tuần này
                 </Typography>
-                <Typography sx={{ fontWeight: 700 }}>0₫</Typography>
+                <Typography sx={{ fontWeight: 700 }}>
+                  {formatVND(totalRevenue)}
+                </Typography>
               </Box>
 
               <Box sx={{ minWidth: 0 }}>
                 <Typography sx={{ fontSize: 15, color: "text.secondary" }}>
                   Tháng này
                 </Typography>
-                <Typography sx={{ fontWeight: 700 }}>0₫</Typography>
+                <Typography sx={{ fontWeight: 700 }}>
+                  {formatVND(totalRevenue)}
+                </Typography>
               </Box>
             </Stack>
           </Paper>
@@ -64,7 +69,7 @@ const OverviewRevenue = () => {
               Tổng cộng
             </Typography>
             <Typography variant="h5" sx={{ mt: 1, fontWeight: 800 }}>
-              192.722.000₫
+              {formatVND(totalRevenue)}
             </Typography>
           </Paper>
         </Stack>

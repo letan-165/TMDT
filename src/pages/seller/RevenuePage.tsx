@@ -1,25 +1,44 @@
 import { Box, Stack, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Order } from "../../apis/dto/Response";
+import OrderService from "../../apis/services/OrderService";
+import BodyOrder from "../../components/molecules/order/BodyOrder";
 import OrderNav from "../../components/molecules/order/OrderNav";
-import DetailRevenue from "../../components/molecules/revenue/DetailRevenue";
-import ExcelRevenue from "../../components/molecules/revenue/ExcelRevenue";
+import ExcelRevenue, {
+  DateRange,
+} from "../../components/molecules/revenue/ExcelRevenue";
 import OverviewRevenue from "../../components/molecules/revenue/OverviewRevenue";
 import StatisticalRevenue from "../../components/molecules/revenue/StatisticalRevenue";
 import FooterCus from "../../components/organisms/FooterCus";
 import { HeaderCustomerCus } from "../../components/organisms/HeaderCustomerCus";
 import NavigationBar from "../../components/organisms/NavigationBar";
 
-const data = Array.from({ length: 7 }, (_, i) => ({
-  id: i + 1,
-  revenue: 590000,
-  carrier: "Go ject",
-  createdAt: "12/08/2025",
-  deliveryAt: "lê minh tân",
-  status: ["Chưa thanh toán", "Đã thanh toán"][i % 2],
-}));
-
 const RevenuePage = () => {
   const [page, setPage] = useState(0);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [range, setRange] = useState<DateRange | null>(null);
+
+  const userID = localStorage.getItem("userID");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await OrderService.getBySeller(userID);
+        setOrders(res);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    fetchData();
+  }, [userID]);
+
+  const filteredOrders = orders.filter((o) => {
+    if (!range) return true;
+    const d = new Date(o.createdAt);
+    return d >= new Date(range.start) && d <= new Date(range.end + "T23:59:59");
+  });
+  const totalRevenue = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
   return (
     <Box sx={{ fontFamily: "sans-serif", bgcolor: "#fff" }}>
       <HeaderCustomerCus />
@@ -28,16 +47,16 @@ const RevenuePage = () => {
         <Stack width={1200}>
           <HeaderRevenue />
           <StatisticalRevenue />
-          <OverviewRevenue />
+          <OverviewRevenue totalRevenue={totalRevenue} />
           <OrderNav
             title={"Chi tiết thanh toán"}
             page={page}
             setPage={setPage}
             justifyContent="none"
-            nav={["Chưa thanh toán", "Đã thanh toán"]}
+            nav={[]}
           />
-          <ExcelRevenue />
-          <DetailRevenue data={data} />
+          <ExcelRevenue orders={filteredOrders} onRangeChange={setRange} />
+          <BodyOrder orders={filteredOrders} isAdmin={false} />
         </Stack>
       </Stack>
       <FooterCus />
