@@ -3,6 +3,8 @@ import { Box, Card, CardContent, Divider, Typography } from "@mui/material";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ButtonLoginCus } from "../../components/atoms/Form/ButtonLoginCus";
 import { Paths } from "../../Paths";
+import { useEffect } from "react";
+import OrderService from "../../apis/services/OrderService";
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -16,6 +18,32 @@ const PaymentSuccess = () => {
     bankCode: searchParams.get("vnp_BankCode"),
     payDate: searchParams.get("vnp_PayDate"),
   };
+
+  const vnpayParams = {
+    vnp_TxnRef: searchParams.get("vnp_TxnRef") || "",         // Mã đơn hàng
+    vnp_Amount: searchParams.get("vnp_Amount") || "",
+    vnp_TransactionNo: searchParams.get("vnp_TransactionNo") || "",  
+    vnp_BankCode: searchParams.get("vnp_BankCode") || "",
+    vnp_CardType: searchParams.get("vnp_CardType") || "",
+    vnp_ResponseCode: searchParams.get("vnp_ResponseCode") || "", 
+    vnp_TransactionStatus: searchParams.get("vnp_TransactionStatus") || "",
+    vnp_OrderInfo: searchParams.get("vnp_OrderInfo") || "",
+    vnp_PayDate: searchParams.get("vnp_PayDate") || "",
+    vnp_SecureHash: searchParams.get("vnp_SecureHash") || "",
+  };
+  useEffect(() => {
+    const handleVNPayCallback = async () => {
+
+      try {
+        const result = await OrderService.callBack(vnpayParams);
+        console.log("Payment callback result:", result);
+      } catch (error) {
+        console.error("Error handling payment callback:", error);
+      }
+    };
+
+    handleVNPayCallback();
+  }, []);
 
   return (
     <Box
@@ -68,13 +96,13 @@ const PaymentSuccess = () => {
               <strong>Thời gian:</strong>{" "}
               {order.payDate
                 ? `${order.payDate.substring(6, 8)}/${order.payDate.substring(
-                    4,
-                    6
-                  )}/${order.payDate.substring(0, 4)} 
+                  4,
+                  6
+                )}/${order.payDate.substring(0, 4)} 
                    ${order.payDate.substring(8, 10)}:${order.payDate.substring(
-                     10,
-                     12
-                   )}:${order.payDate.substring(12, 14)}`
+                  10,
+                  12
+                )}:${order.payDate.substring(12, 14)}`
                 : new Date().toLocaleString("vi-VN")}
             </Typography>
           </Box>
