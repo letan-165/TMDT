@@ -12,10 +12,6 @@ export class CreateUserDto {
     @IsNotEmpty()
     password: string;
 
-    @IsNotEmpty()
-    @IsPhoneNumber("VN")
-    phone: string;
-
     @IsString()
     @IsNotEmpty()
     name: string;

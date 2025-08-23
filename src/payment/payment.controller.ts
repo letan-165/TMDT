@@ -26,12 +26,6 @@ export class PaymentController {
     return await this.paymentService.handleVnpayCallback(callbackQuery);
   }
 
-  @Post('callback') // Support both GET and POST callback
-  @Public()
-  async vnpayCallbackPost(@Body() callbackDto: VnpayCallbackDto) {
-    return await this.paymentService.handleVnpayCallback(callbackDto);
-  }
-
   @Get('list')
   async getPaymentList() {
     return await this.paymentService.getPaymentList();
