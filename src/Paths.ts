@@ -11,4 +11,5 @@ export const Paths = {
   ORDER: "/order",
   REVENUE: "/revenue",
   DISCOUNT: "/discount",
+  PAYMENT_SUCCESS: "/payment",
 } as const;

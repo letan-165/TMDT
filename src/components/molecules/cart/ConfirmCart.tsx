@@ -2,6 +2,7 @@ import { Box, Chip, Paper, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { OrderRequest } from "../../../apis/dto/Request";
 import { CartItem } from "../../../apis/dto/Response";
+import OrderService from "../../../apis/services/OrderService";
 import ConfirmCartCard from "../../atoms/Card/ConfirmCartCard";
 import { ButtonLoginCus } from "../../atoms/Form/ButtonLoginCus";
 
@@ -12,7 +13,7 @@ const ConfirmCart = ({
   items: CartItem[];
   setPage: (page) => void;
 }) => {
-  const handlePayment = () => {
+  const handlePayment = async () => {
     const request: OrderRequest = {
       userId: localStorage.getItem("userID") || "",
       items: items.map((item) => ({
@@ -22,7 +23,12 @@ const ConfirmCart = ({
         sellerId: item.productId.sellerId,
       })),
     };
-    console.log("request", request);
+    try {
+      const res = await OrderService.create(request);
+      window.location.href = res.paymentUrl.paymentUrl;
+    } catch (error) {
+      console.error("Payment error:", error);
+    }
   };
 
   const totalPrice = items.reduce(

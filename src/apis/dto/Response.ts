@@ -96,10 +96,14 @@ export interface Order {
 
 export type OrderResponse = Order[];
 
-export interface PaymentResponse {
+export interface Payment {
   paymentId: string;
   paymentUrl: string;
   orderIds: string[];
   amount: number;
   txnRef: string;
+}
+export interface PaymentResponse {
+  orders: any;
+  paymentUrl: Payment;
 }

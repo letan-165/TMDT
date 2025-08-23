@@ -4,6 +4,7 @@ import CartPage from "./pages/customer/CartPage";
 import CategoryPage from "./pages/customer/CategoryPage";
 import { HomePage } from "./pages/customer/HomePage";
 import IntroducePage from "./pages/customer/IntroducePage";
+import PaymentSuccess from "./pages/customer/PaymentSuccess";
 import ProductPage from "./pages/customer/ProductPage";
 import ProfilePage from "./pages/customer/ProfilePage";
 import SellerSignUp from "./pages/customer/SellerSignUp";
@@ -21,7 +22,7 @@ export default function App() {
         <Route path={Paths.CATEGORY} element={<CategoryPage />} />
         <Route path={Paths.INTRODUCE} element={<IntroducePage />} />
         <Route path={Paths.LOGIN} element={<LoginPage />} />
-        <Route path={Paths.PROFILE} element={<ProfilePage />} />
+        <Route path={`${Paths.PROFILE}`} element={<ProfilePage />} />
         <Route path={`${Paths.PRODUCT}/:productID`} element={<ProductPage />} />
         <Route path={Paths.CART} element={<CartPage />} />
         <Route path={Paths.SELLER_SIGN_UP} element={<SellerSignUp />} />
@@ -29,6 +30,7 @@ export default function App() {
         <Route path={Paths.REVENUE} element={<RevenuePage />} />
         <Route path={Paths.ORDER} element={<OrderPage />} />
         <Route path={Paths.DISCOUNT} element={<DiscountPage />} />
+        <Route path={Paths.PAYMENT_SUCCESS} element={<PaymentSuccess />} />
       </Routes>
     </BrowserRouter>
   );
