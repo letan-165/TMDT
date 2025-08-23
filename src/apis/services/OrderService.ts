@@ -1,5 +1,5 @@
 import axiosClient from "../axiosClient";
-import { OrderRequest } from "../dto/Request";
+import { CallBack, OrderRequest } from "../dto/Request";
 import { Order, PaymentResponse } from "../dto/Response";
 const API_Order = "orders";
 
@@ -8,6 +8,9 @@ const OrderService = {
     return await axiosClient.post(`${API_Order}`, request);
   },
 
+  callBack: async (params: CallBack) => {
+    return await axiosClient.get(`payment/callback`, { params });
+  },
   getBySeller: async (sellerId): Promise<Order[]> => {
     return await axiosClient.get(`${API_Order}/seller/${sellerId}`);
   },
