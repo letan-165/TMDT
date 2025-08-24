@@ -195,7 +195,7 @@ const CardOrder = ({
                 <Col text={it.productId?._id} bold={undefined} />
                 <Col text={it.productId?.name} bold={undefined} />
                 <Col text={it.quantity} bold />
-                <Col text={formatVND(it.price)} bold />
+                <Col text={formatVND(it.price * it.quantity)} bold />
               </Box>
             ))}
           </Stack>

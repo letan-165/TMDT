@@ -23,7 +23,13 @@ const OrderPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setOrders(await OrderService.getBySeller(userID));
+        const response = await OrderService.getBySeller(userID);
+        setOrders(
+          [...response].sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
+        );
       } catch (e) {
         console.error(e);
       }
